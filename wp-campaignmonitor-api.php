@@ -80,6 +80,8 @@ if ( ! class_exists( 'BasecampAPI' ) ) {
 			return json_decode( $body );
 		}
 
+		/* OAUTH. */
+
 		/* ACCOUNT. */
 
 
@@ -96,6 +98,82 @@ if ( ! class_exists( 'BasecampAPI' ) ) {
 
 		}
 
+		public function get_billing_details() {
+
+		}
+
+		public function get_valid_countries() {
+
+		}
+
+		public function get_valid_timezones() {
+
+		}
+
+		public function get_systemdate() {
+
+		}
+
+		public function add_administrator() {
+
+		}
+
+		public function update_administrator() {
+
+		}
+
+		public function get_administrators() {
+
+		}
+
+		public function get_admin_details() {
+
+		}
+
+		public function delete_admin() {
+
+		}
+
+		public function set_primary_contact() {
+
+		}
+
+		public function get_primary_contact() {
+
+		}
+
+		public function single_sign_on() {
+
+		}
+
+
+		/* CAMPAIGNS. */
+
+		public function add_draft_campaign( $client_id ) {
+
+		}
+
+		public function add_campaign_from_template( $client_id ) {
+
+		}
+
+		public function send_draft_campaign( $campaign_id ) {
+
+		}
+
+		/* CLIENTS. */
+
+		/* LISTS. */
+
+		/* SEGMENTS. */
+
+		/* SUBSCRIBERS. */
+
+		/* TEMPLATES. */
+
+		/* TRANSACTIONAL. */
+
+		/* WEBHOOKS. */
 
 	}
 
