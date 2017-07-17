@@ -97,7 +97,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_clients() {
 
-			$request = $this->base_uri . '/clients' . static::$format;
+			$request = $this->base_uri . '/clients.' . static::$format;
 			return $this->fetch( $request );
 
 		}
