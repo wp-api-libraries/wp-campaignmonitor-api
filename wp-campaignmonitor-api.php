@@ -19,7 +19,7 @@
 /* Exit if accessed directly. */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 /* Check if class exists. */
-if ( ! class_exists( 'BasecampAPI' ) ) {
+if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 	/**
 	 * CampaignMonitorAPI class.
 	 */
