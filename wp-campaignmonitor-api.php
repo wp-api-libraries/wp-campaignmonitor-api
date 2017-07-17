@@ -40,6 +40,14 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @access protected
 		 */
 		protected $base_uri = 'https://api.createsend.com/api/v3.1';
+
+		/**
+		 * Return format. XML or JSON.
+		 *
+		 * @var [string
+		 */
+		static private $format;
+
 		/**
 		 * __construct function.
 		 *
@@ -47,9 +55,15 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @param mixed $api_key
 		 * @return void
 		 */
-		public function __construct( $api_key ) {
+		public function __construct( $api_key, $format = 'json' ) {
 
 			static::$api_key = $api_key;
+			static::$format  = $format;
+
+
+			$this->args['headers'] = array(
+				'Authorization' => 'Bearer ' . static::$api_key,
+			);
 
 		}
 		/**
@@ -67,12 +81,13 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 
 			$code = wp_remote_retrieve_response_code( $response );
 			if ( 200 !== $code ) {
-				return new WP_Error( 'response-error', sprintf( __( 'Server response code: %d', 'text-domain' ), $code ) );
+				return new WP_Error( 'response-error', sprintf( __( 'Server response code: %d', 'wp-campaignmonitor-api' ), $code ) );
 			}
 			$body = wp_remote_retrieve_body( $response );
 			return json_decode( $body );
 		}
 		/** OAUTH. */
+
 		/** ACCOUNT. */
 		/**
 		 * Get_clients function.
@@ -82,7 +97,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_clients() {
 
-			$request = $this->base_uri . '/clients' . $ouput;
+			$request = $this->base_uri . '/clients' . static::$format;
 			return $this->fetch( $request );
 
 		}
@@ -541,6 +556,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 
 		}
 		public function get_list_details( $list_id ) {
+
+			$request = $this->base_uri . '/lists/' . $list_id . static::$format;
+			return $this->fetch( $request );
 
 		}
 		public function get_list_stats( $list_id ) {
