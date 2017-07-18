@@ -49,22 +49,30 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		static private $format;
 
 		/**
+		 * Password
+		 *
+		 * @var [string
+		 */
+		static private $password;
+
+
+		/**
 		 * __construct function.
 		 *
 		 * @access public
 		 * @param mixed $api_key
 		 * @return void
 		 */
-		public function __construct( $api_key, $format = 'json' ) {
+		public function __construct( $api_key, $password, $format = 'json' ) {
 
 			static::$api_key = $api_key;
+			static::$password = $password;
 			static::$format  = $format;
 
-
 			$this->args['headers'] = array(
-				'Authorization' => 'Bearer ' . static::$api_key,
+				'Content-Type' => 'application/json',
+				'Authorization' => 'Basic ' . base64_encode($api_key.':'.$password),
 			);
-
 		}
 		/**
 		 * Fetch the request from the API.
@@ -97,7 +105,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_clients() {
 
-			$request = $this->base_uri . '/clients.' . static::$format;
+			$request = $this->base_uri . '/clients.' . static::$format . '?pretty=true';
 			return $this->fetch( $request );
 
 		}
