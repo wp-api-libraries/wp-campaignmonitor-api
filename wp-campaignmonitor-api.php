@@ -115,6 +115,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_billing_details() {
 
+			$request = $this->base_uri . '/billingdetails.' . static::$format;
+			return $this->fetch( $request );
+
 		}
 		/**
 		 * Get_valid_countries function.
@@ -124,7 +127,11 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_valid_countries() {
 
+			$request = $this->base_uri . '/countries.' . static::$format;
+			return $this->fetch( $request );
+
 		}
+
 		/**
 		 * Get_valid_timezones function.
 		 *
@@ -132,6 +139,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function get_valid_timezones() {
+
+			$request = $this->base_uri . '/timezones.' . static::$format;
+			return $this->fetch( $request );
 
 		}
 		/**
@@ -142,6 +152,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_systemdate() {
 
+			$request = $this->base_uri . '/systemdate.' . static::$format;
+			return $this->fetch( $request );
+
 		}
 
 		/**
@@ -151,6 +164,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function add_administrator() {
+
+			$request = $this->base_uri . '/admins.' . static::$format;
+			// return $this->fetch( $request );
 
 		}
 		/**
@@ -168,6 +184,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_administrators() {
 
+			$request = $this->base_uri . '/admins.' . static::$format;
+			return $this->fetch( $request );
+
 		}
 		/**
 		 * Get_admin_details function.
@@ -177,6 +196,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function get_admin_details( $email ) {
+
+			$request = $this->base_uri . '/admins.' . static::$format . '?email=' . $email;
+			return $this->fetch( $request );
 
 		}
 		/**
@@ -188,6 +210,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function delete_admin( $email ) {
 
+			$request = $this->base_uri . '/admins.' . static::$format . '?email=' . $email;
+			// return $this->fetch( $request );
+
 		}
 		/**
 		 * Set_primary_account.
@@ -198,6 +223,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function set_primary_account( $email ) {
 
+			$request = $this->base_uri . '/primarycontact.' . static::$format . '?email=' . $email;
+			return $this->fetch( $request );
+
 		}
 		/**
 		 * Get_primary_account function.
@@ -206,6 +234,10 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function get_primary_account() {
+
+			$request = $this->base_uri . '/primarycontact.' . static::$format;
+			return $this->fetch( $request );
+
 
 		}
 		/**
@@ -216,8 +248,13 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function single_sign_on() {
 
+			$request = $this->base_uri . '/externalsession.' . static::$format;
+			return $this->fetch( $request );
+
 		}
+
 		/** CAMPAIGNS. */
+
 		/**
 		 * Add_draft_campaign function.
 		 *
@@ -226,6 +263,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function add_draft_campaign( $client_id ) {
+
+			$request = $this->base_uri . '/campaigns/' . $client_id . static::$format;
+			return $this->fetch( $request );
 
 		}
 		/**
@@ -237,6 +277,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function add_campaign_from_template( $client_id ) {
 
+			$request = $this->base_uri . '/campaigns/' . $client_id . '/fromtemplate' . static::$format;
+			return $this->fetch( $request );
+
 		}
 		/**
 		 * Send_draft_campaign function.
@@ -247,17 +290,11 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function send_draft_campaign( $campaign_id ) {
 
-		}
-		/**
-		 * Send_campaign_draft function.
-		 *
-		 * @access public
-		 * @param campaignid $campaign_id
-		 * return void
-		 */
-		public function send_campaign_draft( $campaign_id ) {
+			$request = $this->base_uri . '/campaigns/' . $campaign_id . '/send' . static::$format;
+			return $this->fetch( $request );
 
 		}
+
 		/**
 		 * Send_campaign_preview function.
 		 *
@@ -266,6 +303,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function send_campaign_preview( $campaign_id ) {
+
+			$request = $this->base_uri . '/campaigns/' . $campaign_id . '/sendpreview' . static::$format;
+			return $this->fetch( $request );
 
 		}
 		/**
