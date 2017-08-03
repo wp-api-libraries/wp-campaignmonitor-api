@@ -238,8 +238,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * new administrator via email.
 		 *
 		 * @access public
-		 * @param  string $email
-		 * @param  string $name
+		 * @param  string $email Email to perform the action on.
+		 * @param  string $name  Name to assign to this item.
 		 * @return object   		 Confirmation code and email of user added.
 		 */
 		public function add_administrator( $email, $name ) {
@@ -259,7 +259,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * EmailAddress property in the request body to change the email address.
 		 *
 		 * @access public
-		 * @param  string $email
+		 * @param  string $email 		 Email to perform the action on.
 		 * @param  string $new_email Email you would like to change the admin to.
 		 *                           (Does not have to be different).
 		 * @param  string $new_name  Name you would like to change the admin to. (Does
@@ -295,8 +295,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Returns the details of a single administrator associated with an account.
 		 *
 		 * @access public
-		 * @param  string  $email
-		 * @return object Details for an admin.
+		 * @param  string $email Email to get details about.
+		 * @return object 			 Details for an admin.
 		 */
 		public function get_admin_details( $email ) {
 			$args = array(
@@ -312,7 +312,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * They will no longer be able to log into this account
 		 *
 		 * @access public
-		 * @param  string $email
+		 * @param  string $email Email to perform the action on.
 		 * @return object 			 Confirmation code.
 		 */
 		public function delete_admin( $email ) {
@@ -327,7 +327,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * specified email address.
 		 *
 		 * @access public
-		 * @param  string $email
+		 * @param  string $email Email to perform the action on.
 		 * @return object				 Confirmation code
 		 */
 		public function set_primary_account( $email ) {
@@ -365,10 +365,10 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Valid options for this parameter are all, tabs or none.
 		 *
 		 * @access public
-		 * @param  string $email
-		 * @param  string $url
+		 * @param  string $email 				 Email to perform the action on.
+		 * @param  string $url					 See https://www.campaignmonitor.com/api/account/#single-sign-on
 		 * @param  string $integrator_id ID of integrator.
-		 * @param  string $client_id
+		 * @param  string $client_id 		 Client to perform action on.
 		 * @param  string $chrome    	   (Default: 'None') ome UI elements can be hidden
 		 *                               from the member via the Chrome parameter.
 		 *                               Valid options for this parameter are all, tabs
@@ -403,16 +403,18 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * automatically generated from the HTML content.
 		 *
 		 * @access public
-		 * @param  string $client_id
-		 * @param  string $name
-		 * @param  string $subject
-		 * @param  string $from_name
-		 * @param  string $from_email
-		 * @param  string $html_url
-		 * @param  array  $list_ids
-		 * @param  array  $segment_ids
-		 * @param  string $reply_to    (Default '')
-		 * @param  string $text_url    (Default '')
+		 * @param  string $client_id   Client to perform action on.
+		 * @param  string $name  			 Name to assign to this item.
+		 * @param  string $subject     Subject of the email
+		 * @param  string $from_name   Name of sender
+		 * @param  string $from_email  Email of sender
+		 * @param  string $html_url    URL of the html from which to pull
+		 * @param  array  $list_ids    List of IDs of lists to add emails to
+		 * @param  array  $segment_ids List of IDs of segments to add to
+		 * @param  string $reply_to    (Default '') Optionally different ReplyTo email
+		 * @param  string $text_url    (Default '') Optional url of which to draw text
+		 *                             of the email. If not provided, will be generated
+		 *                             from the HTML.
 		 * @return object 						 ID of campaign created.
 		 */
 		public function add_draft_campaign( $client_id, $name, $subject, $from_name, $from_email, $html_url, $list_ids, $segment_ids, $reply_to = '', $text_url = '' ) {
@@ -421,12 +423,14 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Subject' => $subject,
 				'FromName' => $from_name,
 				'FromEmail' => $from_email,
-				'ReplyTo' => $reply_to,
 				'HtmlUrl' => $html_url,
 				'ListIDs' => $list_ids,
 				'SegmentIDs' => $segment_ids,
 			);
 
+			if( $reply_to !== '' ){
+				$args['ReplyTo'] = $reply_to;
+			}
 			if( $text_url !== '' ){
 				$args['TextUrl'] = $text_url;
 			}
@@ -450,8 +454,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * https://www.campaignmonitor.com/api/campaigns/#creating-campaign-template
 		 *
 		 * @access public
-		 * @param  string $client_id
-		 * @param  object $campaign
+		 * @param  string $client_id Client to perform action on.
+		 * @param  object $campaign  A campaign object. See link above.
 		 * @return object					   ID of campaign created.
 		 */
 		public function add_campaign_from_template( $client_id, $campaign ) {
@@ -471,9 +475,11 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * addresses per day.
 		 *
 		 * @access public
-		 * @param  string $campaign_id ID of campaign to perform the action on.
-		 * @param  string $confirmation_email
-		 * @param  string $send_date
+		 * @param  string $campaign_id 				ID of campaign to perform the action on.
+		 * @param  string $confirmation_email An email address to send the confirmation
+		 *                                    to that the campaign has been sent.
+		 * @param  string $send_date					Date of which the campaign should be
+		 *                               			scheduled to be sent.
 		 * @return object											Confirmation code.
 		 */
 		public function send_draft_campaign( $campaign_id, $confirmation_email, $send_date ) {
@@ -492,9 +498,11 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * your draft campaign.
 		 *
 		 * @access public
-		 * @param  string $campaign_id ID of campaign to perform the action on.
-		 * @param  array  $preview_recipients
-		 * @param  string $personalize
+		 * @param  string $campaign_id 				ID of campaign to perform the action on.
+		 * @param  array  $preview_recipients	A list of emails to send previews to.
+		 * @param  string $personalize				Whether to personalize it or not. Acceptable
+		 *                                		values are 'Fallback', 'Random', or a valid
+		 *                                		email address.
 		 * @return object											Confirmation code.
 		 */
 		public function send_campaign_preview( $campaign_id, $preview_recipients, $personalize ) {
@@ -783,10 +791,17 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 
 		/** CLIENTS. */
 		/**
-		 * Add_client function.
+		 * Creating a client
+		 *
+		 * Creates a new client in your account with basic contact information and no
+		 * access to the application. Client billing options are set once the client
+		 * is created.
 		 *
 		 * @access public
-		 * return void
+		 * @param  string $company_name Name of the company.
+		 * @param  string $country
+		 * @param  string $timezone
+		 * @return object 							Confirmation and ID of client created.
 		 */
 		public function add_client( $company_name, $country, $timezone ) {
 			$args = array(
@@ -798,88 +813,133 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		}
 
 		/**
-		 * Get_client_details function.
+		 * Getting a client's details
+		 *
+		 * Get the complete details for a client including their API key, access level,
+		 * contact details and billing settings.
+		 *
+		 * If there is only one Person in this Client, their Email Address, Contant
+		 * Name and Access Details are returned. If there are multiple Persons in this
+		 * Client, or no Persons at all, these fields are omitted in the response.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @return object 					 Client details.
 		 */
 		public function get_client_details( $client_id ) {
 			return $this->run( '/clients/' . $client_id );
 		}
 
 		/**
-		 * Get_sent_campaign function.
+		 * Getting sent campaigns
+		 *
+		 * Returns a list of all sent campaigns for a client including from name, from
+		 * email, reply to email, web version URL, ID, subject, name, date sent, and
+		 * the total number of recipients.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @return object 					 List of all sent campaigns for this client
 		 */
 		public function get_sent_campaign( $client_id ) {
 			return $this->run( "/clients/$client_id/campaigns" );
 		}
 
 		/**
-		 * Get_schedule_campaign function.
+		 * Getting scheduled campaigns
+		 *
+		 * Returns all currently scheduled campaigns for a client including from name,
+		 * from email, reply to email, preview URL, ID, subject, name, date created,
+		 * date scheduled, and the scheduled timezone.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @return object 					 A list of all currently scheduled campaigns
 		 */
 		public function get_schedule_campaign( $client_id ) {
 			return $this->run( "/clients/$client_id/scheduled" );
 		}
 
 		/**
-		 * Get_draft_campaign function.
+		 * Getting draft campaigns
+		 *
+		 * Returns a list of all draft campaigns belonging to that client including from
+		 *  name, from email, reply to email, preview URL, ID, subject, name, and the
+		 *  date the draft was created.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @return object 					 A list of all draft campaigns related to this client.
 		 */
 		public function get_draft_campaign( $client_id ) {
 			return $this->run( "/clients/$client_id/drafts" );
 		}
 
 		/**
-		 * Get_subscriber_lists function.
+		 * Getting subscriber lists
+		 *
+		 * Returns all the subscriber lists that belong to that client, including the
+		 * list name and ID.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @return object 					 A list of subscribers lists. Heh.
 		 */
 		public function get_subscriber_lists( $client_id ) {
 			return $this->run( "/clients/$client_id/lists" );
 		}
 
 		/**
-		 * Get_lists_email_address function.
+		 * Getting lists for an email address
+		 *
+		 * Returns all the subscriber lists across the client, to which an email address
+		 * is subscribed.
+		 *
+		 * For each list to which the email address is subscribed, you will receive the
+		 * list ID, list name, the state of the subscriber on the list, and the date the
+		 * subscriber was added to the list (in the client’s timezone).
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @param  string $email Email to perform the action on.
+		 * @return object 					 Get a list of sub lists for client, where an email
+		 *                           is present.
 		 */
 		public function get_lists_email_address( $client_id, $email ) {
 			return $this->run( "/clients/$client_id/listsforemail", array('email' => $email ) );
 		}
 
 		/**
-		 * Get_segments function.
+		 * Getting segments
+		 *
+		 * Contains a list of all list segments belonging to a particular client.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @return object 					 A list of all list segments for this client.
 		 */
 		public function get_segments( $client_id ) {
 			return $this->run( "/clients/$client_id/segments" );
 		}
 
 		/**
-		 * Get_suppression_list function.
+		 * Getting suppression list
+		 *
+		 * Contains a paged result representing the client’s suppression list.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @param  int 		$page_number     (Default: 1) Pagination, which page to
+		 *                                 start on.
+		 * @param  int 		$page_size			 (Default: 1000) Pagination, how many results
+		 *                                 to display per page.
+		 * @param  string $order_field		 (Default: 'email') The field which should
+		 *                               	 be used to order the results. Acceptable
+		 *                               	 values are 'list', 'email', and 'date'.
+		 * @param  string $order_direction (Defaul: 'asc') Whether to display results
+		 *                                 in an ascending ('asc') or descending ('desc')
+		 *                                 order.
+		 * @return object 								 Paginated result of the client's suppression.
 		 */
 		public function get_suppression_list( $client_id, $page = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
 			$args = array(
@@ -892,48 +952,63 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		}
 
 		/**
-		 * Add_suppress_email_address function.
-		 * $email_addresses should be an array of emails
+		 * Suppress email addresses
+		 *
+		 * Adds the email addresses provided to the client’s suppression list.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @param  array  $email_address An array of emails to add.
+		 * @return object 							 Confirmation code.
 		 */
-		public function add_suppress_email_address( $client_id, $email_addresses ) {
+		public function suppress_email_address( $client_id, $email_addresses ) {
 			return $this->run( "/clients/$client_id/suppress", array( 'EmailAddresses' => $email_addresses) );
 		}
 
 		/**
-		 * Delete_supress_email_address function.
+		 * Unsuppress an email address
+		 *
+		 * Unsuppresses an email address by removing the email address from a client’s
+		 * suppression list.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @param  string $email Email to perform the action on.
+		 * @return object 					 Confirmation code
 		 */
-		public function delete_supress_email_address( $client_id, $email ) {
+		public function unsuppress_email_address( $client_id, $email ) {
 			$request = "/clients/$client_id/unsuppress.$this->format?email=$email";
 			return $this->run( $request, array(), 'PUT', true );
 		}
 
 		/**
-		 * Get_templates function.
+		 * Getting templates
+		 *
+		 * Contains a list of the templates belonging to the client including the ID,
+		 * name and a URL for a screenshot and HTML preview of the template.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @return object 					 A list of the templates belonging to the client.
 		 */
 		public function get_templates( $client_id ) {
 			return $this->run( "/clients/$client_id/templates/" );
 		}
 
 		/**
-		 * Set_setting_basic_details function.
+		 * Setting basic details
+		 *
+		 * Update the basic account details for an existing client including their name,
+		 * contact details and time zone.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id 	  Client to perform action on.
+		 * @param  string $company_name Name of the company.
+		 * @param  string $country
+		 * @param  string $timezone
+		 * @return object 							Confirmation code.
 		 */
-		public function set_setting_basic_details( $client_id, $company_name, $country, $timezone ) {
+		public function update_setting_basic_details( $client_id, $company_name, $country, $timezone ) {
 			$args = array(
 				'CompanyName' => $company_name,
 				'Country' => $country,
@@ -943,11 +1018,35 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		}
 
 		/**
-		 * Set_payg_billing function.
+		 * Setting PAYG billing
+		 *
+		 * Set if a client can pay for their own campaigns and design and spam tests
+		 * using our PAYG billing. Set the mark-up percentage on each type of fee, and
+		 * if the client can purchase their own email credits to access bulk discounts.
+		 *
+		 * Any specific markup values provided for the MarkupOnDelivery, MarkupPerRecipient
+		 * or MarkupOnDesignSpamTest fields will override the percentage markup for those
+		 * fields only, these fields are optional and should be omitted when not required.
+		 * The MarkupOnDelivery and MarkupOnDesignSpamTest fields should be in the major
+		 * unit for the specified currency (e.g “6.5” means “$6.50”), whilst the
+		 * MarkupPerRecipient should be in the specified currencies minor unit (e.g “6.5”
+		 * means “6.5 cents”). Note: Specific values can not be provided for the credit
+		 * pricing tiers.
+		 *
+		 * Currencies supported are USD (US Dollars), GBP (Great Britain Pounds), EUR
+		 * (Euros), CAD(Canadian Dollars), AUD (Australian Dollars), and NZD (New Zealand
+		 * Dollars).
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $client_id Client to perform action on.
+		 * @param  string $currency
+		 * @param  bool   $can_purchase_credits
+		 * @param  bool   $client_pays
+		 * @param  int    $markup_percentage
+		 * @param  int    $markup_on_delivery
+		 * @param  int    $markup_per_recipient
+		 * @param  int    $markup_on_design_spam_test
+		 * @return object															Confirmation code.
 		 */
 		public function set_payg_billing( $client_id, $currency, $can_purchase_credits, $client_pays, $markup_percentage, $markup_on_delivery, $markup_per_recipient, $markup_on_design_spam_test ) {
 			$args = array(
@@ -969,13 +1068,19 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * using our monthly billing. Set the currency they should pay in plus mark-up
 		 * percentage that will apply to the base prices at each pricing tier.
 		 *
+		 * Currencies supported are USD (US Dollars), GBP (Great Britain Pounds), EUR (Euros),
+		 * CAD(Canadian Dollars), AUD (Australian Dollars), and NZD (New Zealand Dollars).
+		 *
+		 * MonthlyScheme is optional. Supported values are Basic and Unlimited.
+		 *
 		 * @access public
-		 * @param string $client_id
-		 * @param string $currency
-		 * @param bool   $client_pays
-		 * @param string $monthly_scheme
+		 * @param  string $client_id Client to perform action on.
+		 * @param  string $currency
+		 * @param  bool   $client_pays
+		 * @param  string $monthly_scheme (Default: 'Basic')
+		 * @return object 								Confirmation code.
 		 */
-		public function set_monthly_billing( $client_id, $currency, $client_pays, $markup_percentage, $monthly_scheme ) {
+		public function set_monthly_billing( $client_id, $currency, $client_pays, $markup_percentage, $monthly_scheme = 'Basic' ) {
 			$args = array(
 				'Currency' => $currency,
 				'ClientPays' => $client_pays,
@@ -1005,7 +1110,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * false, the client will not be able to continue sending until you allocate
 		 * more credits to them.
 		 *
-		 * @param  string $client_id
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
 		 * @param  int    $credits
 		 * @param  bool   $can_use_my_credits
 		 * @return object Body containing number of credits belonging to account and client.
@@ -1023,7 +1129,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * Delete an existing client from your account.
 		 *
-		 * @param  string $client_id
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
 		 * @return Object
 		 */
 		public function delete_client( $client_id ) {
@@ -1037,11 +1144,14 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * Adds a new person to the client. You can use the permissions helper above
 		 * for selecting an appropriate $access.
-		 * @param  string $client_id
-		 * @param  string $email
-		 * @param  string $name
+		 *
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
+		 * @param  string $email Email to perform the action on.
+		 * @param  string $name  Name to assign to this item.
 		 * @param  int  	 $access
 		 * @param  string $pass
+		 * @return object 					 Confirmation code and email.
 		 */
 		public function add_person( $client_id, $email, $name, $access, $pass ) {
 			$args = array(
@@ -1061,11 +1171,13 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Adds a new person to the client. You can use the permissions helper above
 		 * for selecting an appropriate $access.
 		 *
-		 * @param  string $client_id
-		 * @param  string $email
-		 * @param  string $name
-		 * @param  int  	 $access
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
+		 * @param  string $email Email to perform the action on.
+		 * @param  string $name  Name to assign to this item.
+		 * @param  int  	$access
 		 * @param  string $pass
+		 * @return object 					 Confirmation code and email.
 		 */
 		public function update_person( $client_id, $email, $name, $access, $pass ) {
 			$args = array(
@@ -1083,9 +1195,10 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Contains a list of all (active or invited) people associated with a particular
 		 * client. This will not include account administrators.
 		 *
-		 * @param  string $client_id
-		 * @return Object            list of all (active or invited) people associated with a particular
-		 * client
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
+		 * @return object            list of all (active or invited) people associated
+		 *                           with a particular client.
 		 */
 		public function get_people( $client_id ) {
 			return $this->run( "/clients/$client_id/people" );
@@ -1096,8 +1209,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * Returns the details of a single person associated with a client.
 		 *
-		 * @param  string $client_id
-		 * @param  string $email
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
+		 * @param  string $email Email to perform the action on.
 		 * @return Object            The details of a single person associated with a client.
 		 */
 		public function get_person_details( $client_id, $email ) {
@@ -1110,9 +1224,10 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Changes the status of an active person to a deleted person. They will no
 		 * longer be able to log into this client.
 		 *
-		 * @param  string $client_id
-		 * @param  string $email
-		 * @return Object 						OK response
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
+		 * @param  string $email Email to perform the action on.
+		 * @return Object 					 OK response
 		 */
 		public function delete_person( $client_id, $email ) {
 			return $this->run( "/clients/$client_id/people.$this->format?email=$email", array(), "DELETE", true );
@@ -1124,8 +1239,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Sets the primary contact for the client to be the person with the specified
 		 * email address.
 		 *
-		 * @param  string $client_id
-		 * @param  string $email
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
+		 * @param  string $email Email to perform the action on.
 		 * @return object 					 Email address as a confirmation.
 		 */
 		public function set_primary_contact( $client_id, $email ) {
@@ -1138,7 +1254,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Returns the email address of the person who is selected as the primary
 		 * contact for this client.
 		 *
-		 * @param  string $client_id
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
 		 * @return object            Email address of primary contact.
 		 */
 		public function get_primary_contact( $client_id ) {
@@ -1157,7 +1274,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
  		 * If unsubscribe setting is set to OnlyThisList, when someone unsubscribes
  		 * from this list they will only be unsubscribed from this list.
  		 *
-		 * @param  string $client_id
+ 		 * @access public
+		 * @param  string $client_id Client to perform action on.
 		 * @param  string $title
 		 * @param  string $unsub_page
 		 * @param  string $unsub_setting
@@ -1183,6 +1301,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * of list (single or confirmed opt-in), any custom unsubscribe and confirmation
 		 * URLs you’ve specified, as well as the list’s unsubscribe setting.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @return object          Details for a single list.
 		 */
@@ -1198,6 +1317,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * as time-based data like new subscribers today, yesterday, this week, month
 		 * and year. Here is how we calculate those times:
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @return object          Stats for a list.
 		 */
@@ -1212,6 +1332,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * the type of field, any additional field options you’ve specified, as well
 		 * as whether the field is visible in the subscriber preference center.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @return object          Custom fields for a list.
 		 */
@@ -1226,6 +1347,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * segment and list ID. You can also create your own segments and manage your
 		 * own segment rules via the API.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @return object          Segments for a list.
 		 */
@@ -1241,6 +1363,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * timezone), and any custom field data. You have complete control over how
 		 * results should be returned including page sizes, sort order and sort direction.
 		 *
+		 * @access public
 		 * @param  string  $list_id
 		 * @param  string  $date
 		 * @param  integer $page
@@ -1270,6 +1393,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * have complete control over how results should be returned including page
 		 * sizes, sort order and sort direction.
 		 *
+		 * @access public
 		 * @param  string  $list_id
 		 * @param  string  $date
 		 * @param  integer $page
@@ -1297,6 +1421,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * timezone), and any custom field data. You have complete control over how
 		 * results should be returned including page sizes, sort order and sort direction.
 		 *
+		 * @access public
 		 * @param  string  $list_id
 		 * @param  string  $date
 		 * @param  integer $page
@@ -1325,6 +1450,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * control over how results should be returned including page sizes, sort order
 		 * and sort direction.
 		 *
+		 * @access public
 		 * @param  string  $list_id
 		 * @param  string  $date
 		 * @param  integer $page
@@ -1366,6 +1492,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * is set to true, this will scrub all of the active subscribers in this list against
 		 * the suppression list.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @return object          Response confirming
 		 */
@@ -1396,6 +1523,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * fields, the options will be automatically generated and made available when
 		 * getting the list’s custom fields.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  string $field_name
 		 * @param  string $data_type
@@ -1421,6 +1549,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * note that if you change the name of a custom field, the custom field key
 		 * will also be changed. The new key will be returned in the response.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  string $custom_field_key
 		 * @return object 								  Confirmation code.
@@ -1441,6 +1570,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * the value of the KeepExistingOptions property. This will also remove any segment
 		 * rules based on the field.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  string $custom_field_key
 		 * @param  string $keep_options
@@ -1458,8 +1588,10 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		/**
 		 * Deleting a custom field.
 		 *
-		 * Deletes a specific custom field from a list. This will also remove any segment rules based on the field.
+		 * Deletes a specific custom field from a list. This will also remove any segment
+		 * rules based on the field.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  string $custom_field_key
 		 * @return object                   Confirmation code.
@@ -1473,6 +1605,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * Deletes a subscriber list from your account.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @return object          Confirmation code.
 		 */
@@ -1487,6 +1620,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * the response includes its ID, URL, status, payload format and the events on
 		 * which the webhook will be invoked.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @return object          Webhooks
 		 */
@@ -1500,6 +1634,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Creates a new webhook for the provided list. Valid events are Subscribe,
 		 * Deactivate, and Update. Valid payload formats are json, and xml.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  array  $events
 		 * @param  string $url
@@ -1523,6 +1658,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * an example for each event as part of a batch response. Valid payload formats
 		 * are json, and xml.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  string $webhook_id
 		 * @return object             Response of whether it works or not.
@@ -1536,6 +1672,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * Deletes a specific webhook associated with a list.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  string $webhook_id
 		 * @return object             Confirmation code.
@@ -1550,6 +1687,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Activate a webhook associated with a list. Note that despite the fact that
 		 * this is a PUT request, the body of the request should just be empty.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  string $webhook_id
 		 * @return object 				    Confirmation code.
@@ -1564,6 +1702,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Deactivate a webhook associated with a list. Note that despite the fact that
 		 * this is a PUT request, the body of the request should just be empty.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  string $webhook_id
 		 * @return object             Confirmation code.
@@ -1585,6 +1724,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * 	 	construction. The example below creates a segment of any subscribers from
 		 * 	 	‘domain.com’ who subscribed at any point during the year 2009.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  string $title
 		 * @param  array  $rule_groups
@@ -1610,6 +1750,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * rules will be deleted before parsing the new ones. If it is not present,
 		 * existing rules will remain unchanged.
 		 *
+		 * @access public
 		 * @param  string $segment_id
 		 * @param  string $title
 		 * @param  array  $rule_groups
@@ -1617,7 +1758,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function update_segment( $segment_id, $title, $rule_groups = '' ) {
 
-			$args = array( 'Tit	=> $title );
+			$args = array( 'Title'	=> $title );
 
 			if( $rule_groups !== '' ){
 				$args['RuleGroups'] = $rule_groups;
@@ -1635,6 +1776,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * https://www.campaignmonitor.com/api/segments/#adding-segment-rulegroup
 		 *
+		 * @access public
 		 * @param  string $segment_id
 		 * @param  array  $rules
 		 * @return 										Confirmation code.
@@ -1649,6 +1791,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Returns the name, list ID, segment ID and number of active subscribers within
 		 * an existing segment as well as the current rules for that segment.
 		 *
+		 * @access public
 		 * @param  string $segment_id
 		 * @return object             Segment's details.
 		 */
@@ -1664,6 +1807,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * date they subscribed. You have complete control over how results should be
 		 * returned including page sizes, sort order and sort direction.
 		 *
+		 * @access public
 		 * @param  string  $segment_id
 		 * @param  string  $date
 		 * @param  integer $page
@@ -1687,6 +1831,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Deleting a segment.
 		 *
 		 * Deletes an existing segment from a subscriber list.
+		 *
 		 * @param  string $segment_id
 		 * @return object             Confirmation code.
 		 */
@@ -1700,6 +1845,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Clears out any existing rules (and parent rulegroups) for a current segment,
 		 * basically creating a blank slate where new rules can be added.
 		 *
+		 * @access public
 		 * @param  string $segment_id
 		 * @return object             Confirmation code.
 		 */
@@ -1747,9 +1893,10 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * will be restarted. RestartSubscriptionBasedAutoresponders only affects resubscribing
 		 * subscribers, and will default to false if omitted.
 		 *
+		 * @access public
 		 * @param  string $list_id
-		 * @param  string $email
-		 * @param  string $name
+		 * @param  string $email Email to perform the action on.
+		 * @param  string $name  Name to assign to this item.
 		 * @param  array  $custom_fields
 		 * @param  bool   $resub
 		 * @param  bool   $restart_sub_based_autos
@@ -1813,9 +1960,10 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Any registered Update webhooks will be triggered, whether the subscriber
 		 * is inactive or not.
 		 *
+		 * @access public
 		 * @param  string $list_id
-		 * @param  string $email
-		 * @param  string $name
+		 * @param  string $email Email to perform the action on.
+		 * @param  string $name  Name to assign to this item.
 		 * @param  string $custom_fields
 		 * @param  bool   $resub
 		 * @param  bool   $restart_sub_based_autos
@@ -1885,6 +2033,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * LISTID The ID of the subscriber list to which the subscribers should be added.
 		 *
+		 * @access public
 		 * @param  string $list_id
 		 * @param  array  $subs
 		 * @param  bool   $resub
@@ -1908,8 +2057,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Retrieves a subscriber’s details including their email address, name,
 		 * active/inactive state, and any custom field data.
 		 *
+		 * @access public
 		 * @param  string $list_id
-		 * @param  string $email
+		 * @param  string $email Email to perform the action on.
 		 * @return object          Sub's details
 		 */
 		public function get_subscriber_details( $list_id, $email ) {
@@ -1924,8 +2074,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * all the subscriber’s actions are recorded, including the event type, the
 		 * date, and the IP address from which the event occurred.
 		 *
+		 * @access public
 		 * @param  string $list_id
-		 * @param  string $email
+		 * @param  string $email Email to perform the action on.
 		 * @return object
 		 */
 		public function get_subscriber_history( $list_id, $email ) {
@@ -1943,8 +2094,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * then the subscriber’s email address will also be added to the suppression
 		 * list.
 		 *
+		 * @access public
 		 * @param  string $list_id
-		 * @param  string $email
+		 * @param  string $email Email to perform the action on.
 		 * @return object          Confirmation code.
 		 */
 		public function unsubscribe_subscriber( $list_id, $email ) {
@@ -1960,8 +2112,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * This will not result in the subscriber’s email address being added to the
 		 * suppression list.
 		 *
+		 * @access public
 		 * @param  string $list_id
-		 * @param  string $email
+		 * @param  string $email Email to perform the action on.
 		 * @return object          Confirmation code.
 		 */
 		public function delete_subscriber( $list_id, $email ) {
@@ -1975,6 +2128,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Returns all the basic details for a specific template including the name,
 		 * ID, preview URL and screenshot URL.
 		 *
+		 * @access public
 		 * @param  string $template_id
 		 * @return object              Template
 		 */
@@ -1988,8 +2142,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Adds a new template for an existing client by providing the name of the
 		 * template and URLs for the HTML file and a zip of all other files.
 		 *
+		 * @access public
 		 * @param  string $template_id
-		 * @param  string $name
+		 * @param  string $name  Name to assign to this item.
 		 * @param  string $html_url
 		 * @param  string $zip_url
 		 * @return 										 Confirmation code and ID.
@@ -2009,8 +2164,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * Updates an existing template for a client. You can update the name of the
 		 * template and URLs for the HTML file and zip file.
 		 *
+		 * @access public
 		 * @param  string $template_id
-		 * @param  string $name
+		 * @param  string $name  Name to assign to this item.
 		 * @param  string $html_url
 		 * @param  string $zip_url
 		 * @return object              Confirmation code.
@@ -2029,6 +2185,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * Deletes an existing template based on the template ID.
 		 *
+		 * @access public
 		 * @param  string $template_id
 		 * @return object              Confirmation code.
 		 */
@@ -2043,8 +2200,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * To get a list of smart transactional emails, filtered by status:
 		 *
+		 * @access public
 		 * @param  string $status
-		 * @param  string $client_id
+		 * @param  string $client_id Client to perform action on.
 		 * @return object            List of responses.
 		 */
 		public function get_smart_transactional_email_list( $status = 'all', $client_id ) {
@@ -2060,6 +2218,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * To get the details for a smart transactional email.
 		 *
+		 * @access public
 		 * @param  string $smart_email_id
 		 * @return object                 Smart email details.
 		 */
@@ -2072,6 +2231,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * To deliver a smart email.
 		 *
+		 * @access public
 		 * @param  string $smart_email_id
 		 * @param  string $to
 		 * @param  string $cc
@@ -2098,8 +2258,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * To send an email providing your own content:
 		 *
-		 * @param  string $client_id					Optional if you are using a client API key. Otherwise required.
-		 * @param  string $subject
+		 * @access public
+		 * @param  string $client_id	Client to perform action on. 				Optional if you are using a client API key. Otherwise required.
+		 * @param  string $subject    Subject of the email
 		 * @param  string $from
 		 * @param  string $reply_to
 		 * @param  string $to
@@ -2148,8 +2309,9 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * To get a list of classic email groups.
 		 *
-		 * @param  string $client_id [description]
-		 * @return [type]            [description]
+		 * @access public
+		 * @param  string $client_id Client to perform action on.
+		 * @return object 					 List of class email groups.
 		 */
 		public function get_classic_email_list( $client_id ) {
 			return $this->run( "/transactional/classicEmail/groups", array( 'clientID' => $client_id ), 'GET', true );
@@ -2161,6 +2323,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * To get delivery and engagement statistics, optionally filter by smart email
 		 * or classic group.
 		 *
+		 * @access public
 		 * @param  string $group     (Default: '') Filter results by Group by supplying
 		 *                           a URL-encoded classic group name.
 		 * @param  string $from      (Default: 29 days ago) Iso-8601 date in the format
@@ -2195,6 +2358,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * To get a list of sent messages (classic or smart) filtered by group, email
 		 * date, and more, do the following.
 		 *
+		 * @access public
 		 * @param  string  $group					 (Default: '')
 		 * @param  string  $sent_before_id (Default: null) A messageID used for pagination,
 		 *                                 returns emails sent before the specified message.
@@ -2233,6 +2397,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * To get the message details, no matter how it was sent, including status.
 		 *
+		 * @access public
 		 * @param  string  $message_id ID of the message.
 		 * @param  boolean $statistics (Default: false) Whether to include details opens/clicks.
 		 * @return object 						 Message details.
@@ -2246,6 +2411,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * To resend a message.
 		 *
+		 * @access public
 		 * @param  string $message_id ID of the message.
 		 * @return object             Confirmation response (or failure).
 		 */
