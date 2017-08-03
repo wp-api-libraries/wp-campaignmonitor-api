@@ -18,20 +18,23 @@
 
 /* Exit if accessed directly. */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+// Include base api class.
+include_once( 'wp-api-libraries-base.php' );
+
 /* Check if class exists. */
 if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 	/**
 	 * CampaignMonitorAPI class.
 	 */
-	class CampaignMonitorAPI {
+	class CampaignMonitorAPI extends WpLibrariesBase {
 		/**
 		 * Api_key
 		 *
 		 * @var mixed
 		 * @access private
-		 * @static
 		 */
-		static private $api_key;
+		private $api_key;
 		/**
 		 * BaseAPI Endpoint
 		 *
@@ -46,15 +49,12 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *
 		 * @var [string
 		 */
-		static private $format;
+		private $format;
 
 		/**
-		 * Password
-		 *
-		 * @var [string
+		 * Whether to return it pretty printed or not.
 		 */
-		static private $password;
-
+		private $pretty_print;
 
 		/**
 		 * __construct function.
@@ -63,35 +63,31 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @param mixed $api_key
 		 * @return void
 		 */
-		public function __construct( $api_key, $password, $format = 'json' ) {
+		public function __construct( $api_key, $format = 'json', $pretty_print = false ) {
+			$this->api_key = $api_key;
+			$this->format  = $format;
+			$this->pretty_print = $pretty_print;
+		}
 
-			static::$api_key = $api_key;
-			static::$password = $password;
-			static::$format  = $format;
-
+		protected function set_headers(){
 			$this->args['headers'] = array(
 				'Content-Type' => 'application/json',
-				'Authorization' => 'Basic ' . base64_encode($api_key.':'.$password),
+				'Authorization' => 'Basic ' . base64_encode( $this->api_key . ':nopass'),
 			);
 		}
-		/**
-		 * Fetch the request from the API.
-		 *
-		 * @access private
-		 * @param mixed $request Request URL.
-		 * @return $body Body.
-		 */
-		private function fetch( $request ) {
 
-			$response = wp_remote_request( $request, $this->args );
-
-			$code = wp_remote_retrieve_response_code( $response );
-			if ( 200 !== $code ) {
-				return new WP_Error( 'response-error', sprintf( __( 'Server response code: %d', 'wp-campaignmonitor-api' ), $code ) );
-			}
-			$body = wp_remote_retrieve_body( $response );
-			return json_decode( $body );
+		protected function clear(){
+			$this->args = array();
 		}
+
+		protected function build_request( $request, $args = array(), $method = 'GET' ){
+			if( $this->pretty_print && $method === 'GET' ) {
+				$args += array('pretty' => true );
+			}
+
+			return parent::build_request( $request, $args, $method );
+		}
+
 		/** OAUTH. */
 
 		/** ACCOUNT. */
@@ -103,8 +99,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_clients() {
 
-			$request = $this->base_uri . '/clients.' . static::$format . '?pretty=true';
-			return $this->fetch( $request );
+			$request = '/clients.' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 		/**
@@ -115,8 +111,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_billing_details() {
 
-			$request = $this->base_uri . '/billingdetails.' . static::$format;
-			return $this->fetch( $request );
+			$request = '/billingdetails.' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 		/**
@@ -127,8 +123,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_valid_countries() {
 
-			$request = $this->base_uri . '/countries.' . static::$format;
-			return $this->fetch( $request );
+			$request = '/countries.' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 
@@ -140,20 +136,20 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_valid_timezones() {
 
-			$request = $this->base_uri . '/timezones.' . static::$format;
-			return $this->fetch( $request );
+			$request = '/timezones.' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 		/**
-		 * Get_systemdate function.
+		 * Get current date function.
 		 *
 		 * @access public
 		 * return void
 		 */
 		public function get_systemdate() {
 
-			$request = $this->base_uri . '/systemdate.' . static::$format;
-			return $this->fetch( $request );
+			$request = '/systemdate.' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 
@@ -163,17 +159,28 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @access public
 		 * return void
 		 */
-		public function add_administrator() {
+		public function add_administrator( $email, $name ) {
 
-			$request = $this->base_uri . '/admins.' . static::$format;
-			// return $this->fetch( $request );
+			$request = '/admins.' . $this->format;
+			$args = array(
+				'EmailAddress' => $email,
+				'Name' => $name,
+			);
+			return $this->build_request( $request, $args, 'POST' )->fetch();
 
 		}
 		/**
-		* Set_administrator
+		* Update an administrator
 		 * @param email $email
 		 */
-		public function set_administrator( $email ) {
+		public function update_administrator( $email, $new_email, $new_name ) {
+
+			$request = '/admins.' . $this->format . '?';
+			$args = array(
+				'EmailAddress' => $email,
+				'Name' => $name,
+			);
+			return $this->build_request( $request, $args, 'PUT' )->fetch();
 
 		}
 		/**
@@ -184,8 +191,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_administrators() {
 
-			$request = $this->base_uri . '/admins.' . static::$format;
-			return $this->fetch( $request );
+			$request = '/admins.' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 		/**
@@ -197,8 +204,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_admin_details( $email ) {
 
-			$request = $this->base_uri . '/admins.' . static::$format . '?email=' . $email;
-			return $this->fetch( $request );
+			$request = '/admins.' . $this->format . '?email=' . $email;
+			return $this->build_request( $request )->fetch();
 
 		}
 		/**
@@ -210,8 +217,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function delete_admin( $email ) {
 
-			$request = $this->base_uri . '/admins.' . static::$format . '?email=' . $email;
-			// return $this->fetch( $request );
+			$request = '/admins.' . $this->format . '?email=' . $email;
+			// return $this->build_request( $request )->fetch();
 
 		}
 		/**
@@ -223,8 +230,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function set_primary_account( $email ) {
 
-			$request = $this->base_uri . '/primarycontact.' . static::$format . '?email=' . $email;
-			return $this->fetch( $request );
+			$request = '/primarycontact.' . $this->format . '?email=' . $email;
+			return $this->build_request( $request )->fetch();
 
 		}
 		/**
@@ -235,8 +242,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function get_primary_account() {
 
-			$request = $this->base_uri . '/primarycontact.' . static::$format;
-			return $this->fetch( $request );
+			$request = '/primarycontact.' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 
 		}
@@ -248,8 +255,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function single_sign_on() {
 
-			$request = $this->base_uri . '/externalsession.' . static::$format;
-			return $this->fetch( $request );
+			$request = '/externalsession.' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 
@@ -264,8 +271,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function add_draft_campaign( $client_id ) {
 
-			$request = $this->base_uri . '/campaigns/' . $client_id . static::$format;
-			return $this->fetch( $request );
+			$request = '/campaigns/' . $client_id . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 		/**
@@ -277,8 +284,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function add_campaign_from_template( $client_id ) {
 
-			$request = $this->base_uri . '/campaigns/' . $client_id . '/fromtemplate' . static::$format;
-			return $this->fetch( $request );
+			$request = '/campaigns/' . $client_id . '/fromtemplate' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 		/**
@@ -290,8 +297,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function send_draft_campaign( $campaign_id ) {
 
-			$request = $this->base_uri . '/campaigns/' . $campaign_id . '/send' . static::$format;
-			return $this->fetch( $request );
+			$request = '/campaigns/' . $campaign_id . '/send' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 
@@ -304,8 +311,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function send_campaign_preview( $campaign_id ) {
 
-			$request = $this->base_uri . '/campaigns/' . $campaign_id . '/sendpreview' . static::$format;
-			return $this->fetch( $request );
+			$request = '/campaigns/' . $campaign_id . '/sendpreview' . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 		/**
@@ -603,8 +610,8 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		}
 		public function get_list_details( $list_id ) {
 
-			$request = $this->base_uri . '/lists/' . $list_id . static::$format;
-			return $this->fetch( $request );
+			$request = '/lists/' . $list_id . $this->format;
+			return $this->build_request( $request )->fetch();
 
 		}
 		public function get_list_stats( $list_id ) {
