@@ -1892,31 +1892,173 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 
 		}
 
+		/**
+		 * Send classic email
+		 *
+		 * To send an email providing your own content:
+		 *
+		 * @param  string $client_id					Optional if you are using a client API key. Otherwise required.
+		 * @param  string $subject
+		 * @param  string $from
+		 * @param  string $reply_to
+		 * @param  string $to
+		 * @param  string $cc
+		 * @param  string $bcc
+		 * @param  string $html
+		 * @param  string $text								(Default: false) Optional. Text component of the email. If not provided, will be auto-generated.
+		 * @param  array  $attachments        (Default: array()) Specifies attachments to include with transactional email. Must include Base64 encoded content, a file name, and file type. All file types accepted.
+		 * @param  bool   $track_opens        (Default: true) Whether to track email opens.
+		 * @param  bool   $track_clicks				(Default: true) Whether to track link clicks.
+		 * @param  bool   $inline_css					(Default: true) Moves any CSS inline to improve compatibility with email clients. True by default.
+		 * @param  string $group 							(Default: false) Optional. A name to use for grouping email for reporting.
+		 * @param  bool   $add_recips_to_list (Default: false) Optional. The ID of a subscriber list to add all recipients to, including CC/BCC. You must have permission from your recipients before adding them to a subscriber list to send them marketing email.
+		 * @return Object                     Body detailing successful email acceptances.
+		 */
+		public function send_classic_email( $client_id, $subject, $from, $reply_to, $to, $cc, $bcc, $html, $text = false, $attachments = array(), $track_opens = true, $track_clicks = true, $inline_css = true, $group = false, $add_recips_to_list = false ) {
 
-		public function send_classic_email( $client_id, $subject, $from, $reply_to, $to, $cc, $bcc, $html, $text ) {
+			$args = array(
+				'Subject' => $subject,
+				'From' => $from,
+				'ReplyTo' => $reply_to,
+				'To' => $to,
+				'CC' => $cc,
+				'BCC' => $bcc,
+				'Html' => $html,
+				'Attachments' => $attachments,
+				'TrackOpens' => $track_opens,
+				'TrackClicks' => $track_clicks,
+				'InlineCSS' => $inline_css,
+			);
+
+			if( $text !== false ){
+				$args['Text'] = $text;
+			}
+			if( $group !== false ){
+				$args['Group'] = $group;
+			}
+			if( $add_recips_to_list !== false ){
+				$args['AddRecipientsToListID'] = $add_recips_to_list;
+			}
+
+			return $this->run( "/transactional/classicEmail/send?clientID=$client_id", $args, 'POST', true );
 
 		}
 
+		/**
+		 * Classic email group listing
+		 *
+		 * To get a list of classic email groups.
+		 *
+		 * @param  string $client_id [description]
+		 * @return [type]            [description]
+		 */
 		public function get_classic_email_list( $client_id ) {
+			return $this->run( "/transactional/classicEmail/groups", array( 'clientID' => $client_id ), 'GET', true );
+		}
+
+		/**
+		 * Statistics
+		 *
+		 * To get delivery and engagement statistics, optionally filter by smart email
+		 * or classic group.
+		 *
+		 * @param  string $group     (Default: '') Filter results by Group by supplying
+		 *                           a URL-encoded classic group name.
+		 * @param  string $from      (Default: 29 days ago) Iso-8601 date in the format
+		 *                           YYYY-MM-DD, optional. Default: 29 days ago.
+		 * @param  string $to        (Default: today) Iso-8601 date in the format YYYY-MM-DD,
+		 *                           optional. Default: Today.
+		 * @param  string $time_zone (Default: client's timezone) Values can be utc or
+		 *                           client. Default: client’s time zone. When requesting
+		 *                           statistics for a specific period of time, you can
+		 *                           choose to define that period using either your local
+		 *                           time zone or UTC.
+		 * @param  string $client_id (Default: '') Optional. Note to agencies: if you
+		 *                           are using an account API key or OAuth, this is
+		 *                           required as you need to specify the client. This
+		 *                           is not necessary if you use a client-specific API key.
+		 * @return object            Statistics
+		 */
+		public function get_email_statistics( $group = '', $from = '', $to = '', $time_zone = '', $client_id = '' ) {
+
+			$args = array(
+				'group' => $group,
+				'from' => $from,
+				'to' => $to,
+				'timezone' => $timezone,
+				'clientID' => $clientID,
+			);
+			return $this->run( "/transactional/statistics", $args, 'GET', true );
 
 		}
 
-		public function get_email_statistics( $group = '', $from = '2017-06-13', $to = '2017-07-12', $time_zone = 'PCT', $client_id ) {
+		/**
+		 * Message timeline
+		 *
+		 * To get a list of sent messages (classic or smart) filtered by group, email
+		 * date, and more, do the following.
+		 *
+		 * @param  string  $group					 (Default: '')
+		 * @param  string  $sent_before_id (Default: null) A messageID used for pagination,
+		 *                                 returns emails sent before the specified message.
+		 * @param  string  $sent_after_id	 (Default: null) A messageID used for pagination,
+		 *                                 returns emails sent before the specified message.
+		 * @param  integer $count					 (Default: 50)Maximum number of results to
+		 *                             		 return in a single request. Maximum: 200.
+		 * @param  string  $status         (Default: 'all') Filter messages by status.
+		 *                                 Possible values: 'delivered', 'bounced',
+		 *                                 'spam', and 'all'.
+		 * @param  string  $client_id			 Note to agencies: if you are using an account
+		 *                               	 API key or OAuth, this is required as you need
+		 *                               	 to specify the client. This is not necessary
+		 *                               	 if you use a client-specific API key.
+		 * @return object									 List of sent messages following the given filters.
+		 */
+		public function get_list_message_timeline( $group = '', $sent_before_id = null, $sent_after_id = null, $count = 50, $status = 'all', $client_id = '' ) {
+
+			$args = array(
+				'group' => $group,
+				'count' => $count,
+				'status' => $status,
+				'clientID' => $client_id,
+			);
+
+			if( $sent_before_id !== null ){
+				$args['sentBeforeID'] = $sent_before_id;
+			}
+			if( $sent_after_id !== null ){
+				$args['sentAfterID'] = $sent_after_id;
+			}
+			return $this->run( "/transactional/messages", $args, 'GET', true );
 
 		}
 
-		public function get_list_message_timeline( $group = '', $sent_before_id = null, $sent_after_id = null, $count = 50, $status = 'all', $client_id ) {
-
-		}
-
+		/**
+		 * Message details
+		 *
+		 * To get the message details, no matter how it was sent, including status.
+		 *
+		 * @param  string  $message_id ID of the message.
+		 * @param  boolean $statistics (Default: false) Whether to include details opens/clicks.
+		 * @return object 						 Message details.
+		 */
 		public function get_message_details( $message_id, $statistics = false ) {
-
+			return $this->run( "/transactional/messages/$message_id", array( 'statistics' => $statistics ), 'GET', true );
 		}
 
+		/**
+		 * Resend message
+		 *
+		 * To resend a message.
+		 *
+		 * @param  string $message_id ID of the message.
+		 * @return object             Confirmation response (or failure).
+		 */
 		public function resend_message( $message_id ) {
-
+			return $this->run( "/transactional/messages/$message_id/resent", array(), 'POST', true );
 		}
 
 		/** WEBHOOKS. */
+		// https://www.campaignmonitor.com/api/webhooks/
 	}
 }
