@@ -29,17 +29,18 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 	 */
 	class CampaignMonitorAPI extends WpLibrariesBase {
 		/**
-		 * Api_key
+		 * The API key with which all calls are made. Can be either an account API
+		 * token or a client API token.
 		 *
-		 * @var mixed
+		 * @var string
 		 * @access private
 		 */
 		private $api_key;
+
 		/**
-		 * BaseAPI Endpoint
+		 * BaseAPI Endpoint, at which all calls are made.
 		 *
 		 * @var string
-		 * param mixed $api_key
 		 * @access protected
 		 */
 		protected $base_uri = 'https://api.createsend.com/api/v3.1';
@@ -47,20 +48,32 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		/**
 		 * Return format. XML or JSON.
 		 *
-		 * @var [string
+		 * @var string
+		 * @access private
 		 */
 		private $format;
 
 		/**
-		 * Whether to return it pretty printed or not.
+		 * Whether to return responses pretty printed or not.
+		 *
+		 * @var bool
+		 * @access private
 		 */
 		private $pretty_print;
 
 		/**
-		 * __construct function.
+		 * Construction function.
+		 *
+		 * Assigns API Key, format, and whether to pretty print or not outputs.
 		 *
 		 * @access public
-		 * @param mixed $api_key
+		 * @param string $api_key			 The API key with which to make requests (either
+		 *                           	 an account API key or a client API key).
+		 * @param string $format			 (Default: 'json') The format that most (not all)
+		 *                          	 responses should be formatted to. Acceptable
+		 *                          	 values are 'json' and 'xml'.
+		 * @param bool   $pretty_print (Default: false) Whether to pretty print or not
+		 *                             outputs.
 		 * @return void
 		 */
 		public function __construct( $api_key, $format = 'json', $pretty_print = false ) {
@@ -69,6 +82,21 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 			$this->pretty_print = $pretty_print;
 		}
 
+		/**
+		 * Change API key (usually for bouncing between client and account status).
+		 *
+		 * @access public
+		 * @param string $api_key The API key.
+		 */
+		public function set_api_key( $api_key ){
+			$this->api_key = $api_key;
+		}
+
+		/**
+		 * Set headers (internal call).
+		 *
+		 * @access protected
+		 */
 		protected function set_headers(){
 			$this->args['headers'] = array(
 				'Content-Type' => 'application/json',
@@ -76,14 +104,48 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 			);
 		}
 
+		/**
+		 * Clear headers (internal call).
+		 *
+		 * @access protected
+		 * @return void
+		 */
 		protected function clear(){
 			$this->args = array();
 		}
 
+		/**
+		 * Run a build_request( args )->fetch() call.
+		 *
+		 * @access protected
+		 * @param  string $request The route to make the call to.
+		 * @param  array  $args    (Default: array()) An array/object of arguments. If
+		 *                         the call is a GET request, then the arguments well
+		 *                         be formatted as an <code>http_query_string</code>.
+		 *                         Otherwise, it will json_encoded and saved into the
+		 *                         body of the request.
+		 * @param  string $method  (Default: 'GET') The type of request to be made
+		 *                         (ie: 'GET', 'POST', 'DELETE', etc).
+		 * @return object 				 The request.
+		 */
 		protected function run( $request, $args = array(), $method = 'GET', $use_other = false ){
 			return $this->build_request( $request, $args, $method, $use_other )->fetch();
 		}
 
+		/**
+		 * Prepare a request.
+		 *
+		 * @access protected
+		 * @param  string $request The route to make the call to.
+		 * @param  array  $args    (Default: array()) An array/object of arguments. If
+		 *                         the call is a GET request, then the arguments well
+		 *                         be formatted as an <code>http_query_string</code>.
+		 *                         Otherwise, it will json_encoded and saved into the
+		 *                         body of the request.
+		 * @param  string $method  (Default: 'GET') The type of request to be made
+		 *                         (ie: 'GET', 'POST', 'DELETE', etc).
+		 * @return object 				 The request.
+		 */
 		protected function build_request( $request, $args = array(), $method = 'GET', $use_other = false ){
 			if( $this->pretty_print && $method === 'GET' ) {
 				$args += array('pretty' => true );
@@ -102,74 +164,107 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 
 		/** ACCOUNT. */
 		/**
-		 * Get_clients function.
+		 * Getting your clients
+		 *
+		 * Contains a list of all the clients in your account, including their name
+		 * and ID.
 		 *
 		 * @access public
-		 * return void
+		 * @return object List of all the clients in your account.
 		 */
 		public function get_clients() {
 			return $this->run( '/clients' );
 		}
 
 		/**
-		 * Get_billing_details function.
+		 * Getting your billing details.
+		 *
+		 * Returns billing details for your account, including the number of credits
+		 * in your account.
 		 *
 		 * @access public
-		 * return void
+		 * @return object Returns billing details for your account, including the
+		 *                number of credits in your account.
 		 */
 		public function get_billing_details() {
 			return $this->run( '/billingdetails' );
 		}
 
 		/**
-		 * Get_valid_countries function.
+		 * Get valid countries
+		 *
+		 * Contains a list of all the valid countries accepted as input when a country
+		 * is required, typically when creating a client.
 		 *
 		 * @access public
-		 * return void
+		 * @return object List of all valid countries.
 		 */
 		public function get_valid_countries() {
 			return $this->run( '/countries' );
 		}
 
 		/**
-		 * Get_valid_timezones function.
+		 * Getting valid timezones
+		 *
+		 * Contains a list of all the valid timezones accepted as input when a timezone
+		 * is required, typically when creating a client.
 		 *
 		 * @access public
-		 * return void
+		 * @return object List of all valid timezones accepted as input.
 		 */
 		public function get_valid_timezones() {
 			return $this->run( '/timezones' );
 		}
 
 		/**
-		 * Get current date function.
+		 * Getting current date
+		 *
+		 * Contains the current date and time in your account’s timezone. This is useful
+		 * when, for example, you are syncing your Campaign Monitor lists with an external
+		 * list, allowing you to accurately determine the time on our server when you
+		 * carry out the synchronization.
 		 *
 		 * @access public
-		 * return void
+		 * @return object	Current date.
 		 */
 		public function get_systemdate() {
 			return $this->run( '/systemdate' );
 		}
 
 		/**
-		 * Add_administrator function.
+		 * Adding an administrator
+		 *
+		 * Adds a new administrator to the account. An invitation will be sent to the
+		 * new administrator via email.
 		 *
 		 * @access public
-		 * return void
+		 * @param  string $email
+		 * @param  string $name
+		 * @return object   		 Confirmation code and email of user added.
 		 */
 		public function add_administrator( $email, $name ) {
-
 			$args = array(
 				'EmailAddress' => $email,
 				'Name' => $name,
 			);
 			return $this->run( '/admins', $args, 'POST' );
-
 		}
 
 		/**
-		 * Update an administrator
-		 * @param email $email
+		 * Updating an administrator
+		 *
+		 * Updates the email address and/or name of an administrator.
+		 *
+		 * Note: the email value in the query string is the old email address. Use the
+		 * EmailAddress property in the request body to change the email address.
+		 *
+		 * @access public
+		 * @param  string $email
+		 * @param  string $new_email Email you would like to change the admin to.
+		 *                           (Does not have to be different).
+		 * @param  string $new_name  Name you would like to change the admin to. (Does
+		 *                           not have to be different).
+		 * @return object 					 Confirmation code and email of user modified.
 		 */
 		public function update_administrator( $email, $new_email, $new_name ) {
 
@@ -179,84 +274,108 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Name' => $name,
 			);
 			return $this->run( $request, $args, 'PUT', true );
-
 		}
 
 		/**
-		 * Get_administrators function.
+		 * Getting administrators
+		 *
+		 * Contains a list of all (active or invited) administrators associated with
+		 * a particular account.
 		 *
 		 * @access public
-		 * return void
+		 * @return object List of all administrators.
 		 */
 		public function get_administrators() {
-
 			return $this->run( '/admins' );
-
 		}
 
 		/**
-		 * Get_admin_details function.
+		 * Administrator details
+		 *
+		 * Returns the details of a single administrator associated with an account.
 		 *
 		 * @access public
-		 * @param email $email
-		 * return void
+		 * @param  string  $email
+		 * @return object Details for an admin.
 		 */
 		public function get_admin_details( $email ) {
-
 			$args = array(
 				'email' => $email,
 			);
 			return $this->run( '/admins', $args );
-
 		}
 
 		/**
-		 * Delete_admin function.
+		 * Deleting an administrator
+		 *
+		 * Changes the status of an active administrator to a deleted administrator.
+		 * They will no longer be able to log into this account
 		 *
 		 * @access public
-		 * @param email $email
-		 * return void
+		 * @param  string $email
+		 * @return object 			 Confirmation code.
 		 */
 		public function delete_admin( $email ) {
-
 			$request = '/admins' . $this->format . '?email=' . $email;
 			return $this->run( $request, array(), 'DELETE', true );
-
 		}
 
 		/**
-		 * Set_primary_account.
+		 * Setting primary contact
+		 *
+		 * Sets the primary contact for the account to be the administrator with the
+		 * specified email address.
 		 *
 		 * @access public
-		 * @param email $email
-		 * return void
+		 * @param  string $email
+		 * @return object				 Confirmation code
 		 */
 		public function set_primary_account( $email ) {
-
 			$request = '/primarycontact' . $this->format . '?email=' . $email;
 
 			return $this->run( $request, array(), 'PUT', true );
-
 		}
 
 		/**
-		 * Get_primary_account function.
+		 * Getting primary contact
+		 *
+		 * Returns the email address of the administrator who is selected as the primary
+		 * contact for this account.
 		 *
 		 * @access public
-		 * return void
+		 * @return object Primary account email.
 		 */
 		public function get_primary_account() {
 			return $this->run( '/primarycontact' );
 		}
 
 		/**
-		 * Single_sign_on function.
+		 * Single sign on
+		 *
+		 * Initiates a new login session for the member with the specified email address.
+		 *
+		 * Before you can use this method you’ll have to get in touch with CampaignMonitor
+		 * to obtain an IntegratorID. Once you’ve registered you can create login sessions
+		 * for account members, optionally directing them to a specific page. This method
+		 * will return a single use url which will create the login session. This is
+		 * usually used as the source of an iframe for embedding Campaign Monitor within
+		 * your own application.
+		 *
+		 * Some UI elements can be hidden from the member via the Chrome parameter.
+		 * Valid options for this parameter are all, tabs or none.
 		 *
 		 * @access public
-		 * return void
+		 * @param  string $email
+		 * @param  string $url
+		 * @param  string $integrator_id ID of integrator.
+		 * @param  string $client_id
+		 * @param  string $chrome    	   (Default: 'None') ome UI elements can be hidden
+		 *                               from the member via the Chrome parameter.
+		 *                               Valid options for this parameter are all, tabs
+		 *                               or none.
+		 * @return object								 Confirmation code and session URL.
 		 */
 		public function single_sign_on( $email, $url, $integrator_id, $client_id, $chrome = 'None') {
-
 			$args = array(
 				'Email' => $email,
 				'Chrome' => $chrome,
@@ -265,26 +384,38 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'ClientID' => $client_id,
 			);
 			return $this->run( '/externalsession', $args, 'PUT' );
-
 		}
 
 		/** CAMPAIGNS. */
 
 		/**
-		 * Add Draft Campaign.
-		 * @param string $client_id   [description]
-		 * @param string $name        [description]
-		 * @param string $subject     [description]
-		 * @param string $from_name   [description]
-		 * @param string $from_email  [description]
-		 * @param string $html_url    [description]
-		 * @param array  $list_ids    [description]
-		 * @param array  $segment_ids [description]
-		 * @param string $reply_to    [description]
-		 * @param string $text_url    [description]
+		 * Creating a draft campaign
+		 *
+		 * Creates (but does not send) a draft campaign ready to be tested as a preview
+		 * or sent. Set the basic campaign information (name, subject, from name and
+		 * from email), the URL of the HTML content plus the lists and/or segments you’d
+		 * like it to be eventually sent to. We’ll automatically move all CSS inline
+		 * for the HTML component.
+		 *
+		 * Note that you may optionally specify a TextUrl field in your input if you
+		 * want to specify text content for the campaign. If you don’t specify TextUrl
+		 * or if TextUrl is left empty, the text content for the campaign will be
+		 * automatically generated from the HTML content.
+		 *
+		 * @access public
+		 * @param  string $client_id
+		 * @param  string $name
+		 * @param  string $subject
+		 * @param  string $from_name
+		 * @param  string $from_email
+		 * @param  string $html_url
+		 * @param  array  $list_ids
+		 * @param  array  $segment_ids
+		 * @param  string $reply_to    (Default '')
+		 * @param  string $text_url    (Default '')
+		 * @return object 						 ID of campaign created.
 		 */
 		public function add_draft_campaign( $client_id, $name, $subject, $from_name, $from_email, $html_url, $list_ids, $segment_ids, $reply_to = '', $text_url = '' ) {
-
 			$args = array(
 				'Name' => $name,
 				'Subject' => $subject,
@@ -300,101 +431,147 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				$args['TextUrl'] = $text_url;
 			}
 			return $this->run( '/campaigns/' . $client_d, $args, 'POST' );
-
 		}
 
 		/**
-		 * Add_campaign_from_template function.
+		 * Creating a campaign from a template
+		 *
+		 * Creates (but does not send) a draft campaign based on a template ready to
+		 * be tested as a preview or sent. Set the basic campaign information (name,
+		 * subject, from name and from email), the template ID, the template content,
+		 * plus the lists and/or segments you’d like it to be eventually sent to. You
+		 * can find the template ID you want to use by getting a client’s templates.
+		 *
+		 * Note: Creating a campaign from a Canvas template is currently not supported.
+		 *
+		 * See the link below for what the format of the $campaign object should look
+		 * like.
+		 *
 		 * https://www.campaignmonitor.com/api/campaigns/#creating-campaign-template
 		 *
 		 * @access public
-		 * @param clientid $client_id
-		 * return void
+		 * @param  string $client_id
+		 * @param  object $campaign
+		 * @return object					   ID of campaign created.
 		 */
 		public function add_campaign_from_template( $client_id, $campaign ) {
 			return $this->run( "/campaigns/$client_id/fromtemplate", $campaign, 'POST' );
 		}
 
 		/**
-		 * Send_draft_campaign function.
+		 * Sending a draft campaign
+		 *
+		 * Schedules an existing draft campaign for sending either immediately or a
+		 * custom date and time in the future. For campaigns with more than 5 recipients,
+		 * you must have sufficient email credits, a saved credit card or an active
+		 * monthly billed account.
+		 *
+		 * Free sending limitation: When sending campaigns to 5 or less recipients
+		 * (which are free of charge), you can send to a maximum of 50 unique email
+		 * addresses per day.
 		 *
 		 * @access public
-		 * @param campaignid $campaign_id
-		 * return void
+		 * @param  string $campaign_id ID of campaign to perform the action on.
+		 * @param  string $confirmation_email
+		 * @param  string $send_date
+		 * @return object											Confirmation code.
 		 */
 		public function send_draft_campaign( $campaign_id, $confirmation_email, $send_date ) {
-
 			$args = array(
 				'ConfirmationEmail' => $confirmation_email,
 				'SendDate' => $send_date,
 			);
 			return $this->run( "/campaigns/$campaign_id/send", $args, 'POST' );
-
 		}
 
 		/**
-		 * Send_campaign_preview function.
+		 * Sending a campaign preview
+		 *
+		 * Send a preview of any draft campaign to a number of email addresses you
+		 * specify. You can also set how we should treat any personalization tags in
+		 * your draft campaign.
 		 *
 		 * @access public
-		 * @param campaignid $campaign_id
-		 * return void
+		 * @param  string $campaign_id ID of campaign to perform the action on.
+		 * @param  array  $preview_recipients
+		 * @param  string $personalize
+		 * @return object											Confirmation code.
 		 */
 		public function send_campaign_preview( $campaign_id, $preview_recipients, $personalize ) {
-
 			$args = array(
 				'PreviewRecipients' => $preview_recipients,
 				'Personalize' => $personalize,
 			);
 			return $this->run( "/campaigns/$campaign_id/sendpreview", $args, 'POST' );
-
 		}
 
 		/**
-		 * Get_campaign_summary function.
+		 * Campaign Summary
+		 *
+		 * Provides a basic summary of the results for any sent campaign such as the
+		 * number of recipients, opens, clicks, unsubscribes, etc to date. Also includes
+		 * the web version URL, and the public Worldview URL for the campaign.
 		 *
 		 * @access public
-		 * @param campaignid $campaign_id
-		 * return void
+		 * @param  string $campaign_id ID of campaign to perform the action on.
+		 * @return object 						 Campaign summary.
 		 */
 		public function get_campaign_summary( $campaign_id ) {
 			return $this->run( "/campaigns/$campaign_id/summary" );
 		}
 
 		/**
-		 * Get_list_campaign_clients_emails function.
+		 * Campaign email client usage
+		 *
+		 * Lists the email clients subscribers used to open the campaign. Each entry
+		 * includes the email client name, the email client version, the percentage of
+		 * subscribers who used it, and the actual number of subscribers who used it
+		 * to open the campaign.
 		 *
 		 * @access public
-		 * @param campaignid $campaign_id
-		 * return void
+		 * @param  string $campaign_id ID of campaign to perform the action on.
+		 * @return object 						 The email clients used to open the campaign + some.
 		 */
 		public function get_list_campaign_client_emails( $campaign_id ) {
 			return $this->run( "/campaigns/$campaign_id/emailclientusage" );
 		}
 
 		/**
-		 * Get_list_and_segments_campaign function.
+		 * Campaign lists and segments
+		 *
+		 * Returns the lists and segments any campaign was sent to.
 		 *
 		 * @access public
-		 * @param campaignid $campaign_id
-		 * return void
+		 * @param  string $campaign_id ID of campaign to perform the action on.
+		 * @return object 						 Lists and segments any campaign was sent to.
 		 */
 		public function get_lists_and_segments_campaign( $campaign_id ) {
 			return $this->run( "/campaigns/$campaign_id/listsandsegments" );
 		}
 
 		/**
-		 * Get_campaign_recipients function.
+		 * Campaign recipients
+		 *
+		 * Retrieves a paged result representing all the subscribers that a given campaign
+		 * was sent to. This includes their email address and the ID of the list they
+		 * are a member of. You have complete control over how results should be returned
+		 * including page size, sort order and sort direction.
 		 *
 		 * @access public
-		 * @param campaignid $campaign_id
-		 * @param int $page_number
-		 * @param int $page_size
-		 * @param string $order_field
-		 * @param string $order_direction
-		 * return void
+		 * @param  string $campaign_id     ID of campaign to perform the action on.
+		 * @param  int 		$page_number     (Default: 1) Pagination, which page to
+		 *                                 start on.
+		 * @param  int 		$page_size			 (Default: 1000) Pagination, how many results
+		 *                                 to display per page.
+		 * @param  string $order_field		 (Default: 'email') The field which should
+		 *                               	 be used to order the results. Acceptable
+		 *                               	 values are 'list', 'email', and 'date'.
+		 * @param  string $order_direction (Defaul: 'asc') Whether to display results
+		 *                                 in an ascending ('asc') or descending ('desc')
+		 *                                 order.
+		 * @return object 								 The results of your search.
 		 */
 		public function get_campaign_recipients( $campaign_id, $page_number = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
-
 			$args = array(
 				'page' => $page_number,
 				'pagesize' => $paze_size,
@@ -402,18 +579,31 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/campaigns/$campaign_id/recipients", $args );
-
 		}
 
 		/**
-		 * Get_campaign_bounces function.
+		 * Campaign bounces
+		 *
+		 * Retrieves a paged result representing all the subscribers who bounced for
+		 * a given campaign, and the type of bounce (Hard = Hard Bounce, Soft = Soft
+		 * Bounce). You have complete control over how results should be returned
+		 * including page size, sort order and sort direction.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $campaign_id     ID of campaign to perform the action on.
+		 * @param  int 		$page_number     (Default: 1) Pagination, which page to
+		 *                                 start on.
+		 * @param  int 		$page_size			 (Default: 1000) Pagination, how many results
+		 *                                 to display per page.
+		 * @param  string $order_field		 (Default: 'email') The field which should
+		 *                               	 be used to order the results. Acceptable
+		 *                               	 values are 'list', 'email', and 'date'.
+		 * @param  string $order_direction (Defaul: 'asc') Whether to display results
+		 *                                 in an ascending ('asc') or descending ('desc')
+		 *                                 order.
+		 * @return object 								 The results of your search.
 		 */
 		public function get_campaign_bounces( $campaign_id, $date = '', $page = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page,
@@ -422,18 +612,33 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/campaigns/$campaign_id/bounces", $args );
-
 		}
 
 		/**
-		 * Get_campaign_opens function.
+		 * Campaign opens
+		 *
+		 * Retrieves a paged result representing all subscribers who opened a given
+		 * campaign, including the date/time and IP address from which they opened the
+		 * campaign. When possible, the latitude, longitude, city, region, country code,
+		 * and country name as geocoded from the IP address, are also returned. You have
+		 * complete control over how results should be returned including page size,
+		 * sort order and sort direction.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $campaign_id     ID of campaign to perform the action on.
+		 * @param  int 		$page_number     (Default: 1) Pagination, which page to
+		 *                                 start on.
+		 * @param  int 		$page_size			 (Default: 1000) Pagination, how many results
+		 *                                 to display per page.
+		 * @param  string $order_field		 (Default: 'email') The field which should
+		 *                               	 be used to order the results. Acceptable
+		 *                               	 values are 'list', 'email', and 'date'.
+		 * @param  string $order_direction (Defaul: 'asc') Whether to display results
+		 *                                 in an ascending ('asc') or descending ('desc')
+		 *                                 order.
+		 * @return object 								 The results of your search.
 		 */
 		public function get_campaign_opens( $campaign_id, $date = '', $page_number = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page_number,
@@ -442,18 +647,33 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/campaigns/$campaign_id/opens", $args );
-
 		}
 
 		/**
-		 * Get_campaign_clicks function.
+		 * Campaign clicks
+		 *
+		 * Retrieves a paged result representing all subscribers who clicked a link
+		 * in a given campaign, including the date/time and IP address from which they
+		 * clicked the link. When possible, the latitude, longitude, city, region, country
+		 * code, and country name as geocoded from the IP address, are also returned. You
+		 *  have complete control over how results should be returned including page size,
+		 *  sort order and sort direction.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $campaign_id     ID of campaign to perform the action on.
+		 * @param  int 		$page_number     (Default: 1) Pagination, which page to
+		 *                                 start on.
+		 * @param  int 		$page_size			 (Default: 1000) Pagination, how many results
+		 *                                 to display per page.
+		 * @param  string $order_field		 (Default: 'email') The field which should
+		 *                               	 be used to order the results. Acceptable
+		 *                               	 values are 'list', 'email', and 'date'.
+		 * @param  string $order_direction (Defaul: 'asc') Whether to display results
+		 *                                 in an ascending ('asc') or descending ('desc')
+		 *                                 order.
+		 * @return object 								 The results of your search.
 		 */
 		public function get_campaign_clicks( $campaign_id, $date = '', $page_number = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page_number,
@@ -462,18 +682,31 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/campaigns/$campaign_id/clicks", $args );
-
 		}
 
 		/**
-		 * Get_campaign_unsubscribes function.
+		 * Campaign unsubscribes
+		 *
+		 * Retrieves a paged result representing all subscribers who unsubscribed from
+		 * the email for a given campaign, including the date/time and IP address they
+		 * unsubscribed from. You have complete control over how results should be returned
+		 * including page size, sort order and sort direction.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $campaign_id     ID of campaign to perform the action on.
+		 * @param  int 		$page_number     (Default: 1) Pagination, which page to
+		 *                                 start on.
+		 * @param  int 		$page_size			 (Default: 1000) Pagination, how many results
+		 *                                 to display per page.
+		 * @param  string $order_field		 (Default: 'email') The field which should
+		 *                               	 be used to order the results. Acceptable
+		 *                               	 values are 'list', 'email', and 'date'.
+		 * @param  string $order_direction (Defaul: 'asc') Whether to display results
+		 *                                 in an ascending ('asc') or descending ('desc')
+		 *                                 order.
+		 * @return object 								 The results of your search.
 		 */
 		public function get_campaign_unsubscribes( $campaign_id, $date = '', $page_number = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page_number,
@@ -482,18 +715,31 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/campaigns/$campaign_id/unsubscribes", $args );
-
 		}
 
 		/**
-		 * Get_campaign_spam_complaints function.
+		 * Campaign spam complaints
+		 *
+		 * Retrieves a paged result representing all subscribers who marked the given
+		 * campaign as spam, including the subscriber’s list ID and the date/time they
+		 * marked the campaign as spam. You have complete control over how results should
+		 * be returned including page size, sort order and sort direction.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $campaign_id     ID of campaign to perform the action on.
+		 * @param  int 		$page_number     (Default: 1) Pagination, which page to
+		 *                                 start on.
+		 * @param  int 		$page_size			 (Default: 1000) Pagination, how many results
+		 *                                 to display per page.
+		 * @param  string $order_field		 (Default: 'email') The field which should
+		 *                               	 be used to order the results. Acceptable
+		 *                               	 values are 'list', 'email', and 'date'.
+		 * @param  string $order_direction (Defaul: 'asc') Whether to display results
+		 *                                 in an ascending ('asc') or descending ('desc')
+		 *                                 order.
+		 * @return object 								 The results of your search.
 		 */
 		public function get_campaign_spam_complaints( $campaign_id, $date = '', $page_number = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page_number,
@@ -505,22 +751,31 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		}
 
 		/**
-		 * Delete_campaign function.
+		 * Deleting a campaign
+		 *
+		 * Deletes a campaign from your account. For draft and scheduled campaigns (prior
+		 * to the time of scheduling), this will prevent the campaign from sending.
+		 * If the campaign is already sent or in the process of sending, it will remove
+		 * the campaign from the account.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $campaign_id ID of campaign to perform the action on.
+		 * @return object 						 Confirmation code.
 		 */
 		public function delete_campaign( $campaign_id ) {
 			return $this->run( '/campaigns/' . $campaign_id, array(), 'DELETE' );
 		}
 
 		/**
-		 * Unschedule_campaign function.
+		 * Unscheduling a campaign
+		 *
+		 * Cancels the sending of the campaign and moves it back into the drafts. If
+		 * the campaign is already sent or in the process of sending, this operation
+		 * will fail.
 		 *
 		 * @access public
-		 * @param
-		 * return void
+		 * @param  string $campaign_id ID of campaign to perform the action on.
+		 * @return object 						 Confirmation code.
 		 */
 		public function unschedule_campaign( $campaign_id ) {
 			return $this->run( "/campaigns/$campaign_id/unschedule", array(), 'POST' );
@@ -534,7 +789,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function add_client( $company_name, $country, $timezone ) {
-
 			$args = array(
 				'CompanyName' => $company_name,
 				'Country' => $country,
@@ -628,7 +882,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function get_suppression_list( $client_id, $page = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
-
 			$args = array(
 				'page' => $page,
 				'pagesize' => $page_size,
@@ -636,7 +889,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/clients/$client_id/suppressionlist", $args );
-
 		}
 
 		/**
@@ -682,14 +934,12 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function set_setting_basic_details( $client_id, $company_name, $country, $timezone ) {
-
 			$args = array(
 				'CompanyName' => $company_name,
 				'Country' => $country,
 				'TimeZone' => $timezone,
 			);
 			return $this->run( "/clients/$client_id/setbasics", $args, 'PUT' );
-
 		}
 
 		/**
@@ -700,7 +950,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * return void
 		 */
 		public function set_payg_billing( $client_id, $currency, $can_purchase_credits, $client_pays, $markup_percentage, $markup_on_delivery, $markup_per_recipient, $markup_on_design_spam_test ) {
-
 			$args = array(
 				'Currency' => $currency,
 				'CanPurchaseCredits' => $can_purchase_credits,
@@ -711,7 +960,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'MarkupOnDesignSpamTest' => $markup_on_design_spam_test,
 			);
 			return $this->run( "/clients/$client_id/setpaygbilling", $args, 'PUT' );
-
 		}
 
 		/**
@@ -728,7 +976,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @param string $monthly_scheme
 		 */
 		public function set_monthly_billing( $client_id, $currency, $client_pays, $markup_percentage, $monthly_scheme ) {
-
 			$args = array(
 				'Currency' => $currency,
 				'ClientPays' => $client_pays,
@@ -736,7 +983,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'MonthlyScheme' => $monthly_scheme,
 			);
 			return $this->run("/clients/$client_id/setmonthlybilling", $args, 'PUT' );
-
 		}
 
 		/**
@@ -765,13 +1011,11 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object Body containing number of credits belonging to account and client.
 		 */
 		public function transfer_credits( $client_id, $credits, $can_use_my_credits ) {
-
 			$args = array(
 				'Credits' => $credits,
 				'CanUseMyCreditsWhenTheyRunOut' => $can_use_my_credits,
 			);
 			return $this->run( "/clients/$client_id/credits", $args, 'POST' );
-
 		}
 
 		/**
@@ -800,7 +1044,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @param  string $pass
 		 */
 		public function add_person( $client_id, $email, $name, $access, $pass ) {
-
 			$args = array(
 				'EmailAddress' => $email,
 				'Name' => $name,
@@ -808,7 +1051,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Password' => $pass,
 			);
 			return $this->run( "/clients/$client_id/people", $args, 'POST' );
-
 		}
 
 		/**
@@ -826,7 +1068,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @param  string $pass
 		 */
 		public function update_person( $client_id, $email, $name, $access, $pass ) {
-
 			$args = array(
 				'EmailAddress' => $email,
 				'Name' => $name,
@@ -834,7 +1075,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Password' => $pass,
 			);
 			return $this->run( "/clients/$client_id/people", $args, 'PUT' );
-
 		}
 
 		/**
@@ -926,7 +1166,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return string 									 ID of new list.
 		 */
 		public function add_list( $client_id, $title, $unsub_page, $unsub_setting, $confirmed_opt_in, $confirmation_page ) {
-
 			$args = array(
 				'Title' => $title,
 				'UnsubscribePage' => $unsub_page,
@@ -935,7 +1174,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'ConfirmationSuccessPage' => $confirmation_page,
 			);
 			return $this->run( "/lists/$client_id", $args, 'POST' );
-
 		}
 
 		/**
@@ -1012,7 +1250,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object                   List of current subscribers
 		 */
 		public function get_active_list_subscribers( $list_id, $date = '', $page = 1, $page_size = 1000, $order_field = 'date', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page,
@@ -1021,7 +1258,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/lists/$list_id/active", $args );
-
 		}
 
 		/**
@@ -1043,7 +1279,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object                   List of uncomfirmed subscribers
 		 */
 		public function get_unconfirmed_subscribers( $list_id, $date = '', $page = 1, $page_size = 1000, $order_field = 'date', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page,
@@ -1052,7 +1287,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/lists/$list_id/uncomfirmed", $args );
-
 		}
 
 		/**
@@ -1072,7 +1306,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object                   List of bounced subscribers
 		 */
 		public function get_bounced_subscriber( $list_id, $date = '', $page = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page,
@@ -1081,7 +1314,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/lists/$list_id/bounced", $args );
-
 		}
 
 		/**
@@ -1102,7 +1334,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object                   List of unsubscribed subscribers
 		 */
 		public function get_deleted_subscribers( $list_id, $date = '', $page = 1, $page_size = 1000, $order_field = 'email', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page,
@@ -1111,7 +1342,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/lists/$list_id/deleted", $args );
-
 		}
 
 		/**
@@ -1140,7 +1370,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Response confirming
 		 */
 		public function update_list( $list_id, $title, $unsub_page, $unsub_setting, $confirmed_opt_in, $confirmation_page, $add_unsubs_to_supp_list, $scrub_active_with_supp_list ) {
-
 			$args = array(
 				'Title' => $title,
 				'UnsubscribePage' => $unsub_page,
@@ -1151,7 +1380,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'ScrubActiveWithSuppList' => $scrub_active_with_supp_list,
 			);
 			return $this->run( "/lists/$list_id", $args, 'PUT' );
-
 		}
 
 		/**
@@ -1176,7 +1404,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 									 Confirmation codes.
 		 */
 		public function add_custom_field( $list_id, $field_name, $data_type, $options, $visible_in_center ) {
-
 			$args = array(
 				'FieldName' => $field_name,
 				'DataType' => $data_type,
@@ -1184,7 +1411,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'VisibleInPreferenceCenter' => $visible_in_center,
 			);
 			return $this->run( "/lists/$list_id/customfields", $args, 'POST' );
-
 		}
 
 		/**
@@ -1200,13 +1426,11 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 								  Confirmation code.
 		 */
 		public function update_custom_field( $list_id, $custom_field_key, $field_name, $visible_in_center ) {
-
 			$args = array(
 				'FieldName' => $field_name,
 				'VisibleInPreferenceCenter' => $visible_in_center,
 			);
 			return $this->run( "/lists/$list_id/customfields/$custom_field_key", $args, 'PUT' );
-
 		}
 
 		/**
@@ -1224,13 +1448,11 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 								  Confirmation code.
 		 */
 		public function set_custom_field_options( $list_id, $custom_field_key, $keep_options, $options ) {
-
 			$args = array(
 				'KeepExistingOptions' => $keep_options,
 				'Options' => $options,
 			);
 			return $this->run( "/lists/$list_id/customfields/$custom_field_key", $args, 'PUT' );
-
 		}
 
 		/**
@@ -1285,14 +1507,12 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 				        Confirmation object and ID
 		 */
 		public function add_webhook( $list_id, $events, $url, $payload_format ) {
-
 			$args = array(
 				'Events' => $events,
 				'Url' => $url,
 				'PayloadFormat' => $payload_format,
 			);
 			return $this->run( "/lists/$list_id/webhooks", $args, 'POST' );
-
 		}
 
 		/**
@@ -1371,13 +1591,11 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 						 Confirmation code and ID.
 		 */
 		public function add_segment( $list_id, $title, $rule_groups ) {
-
 			$args = array(
 				'Title' => $title,
 				'RuleGroups' => $rule_groups,
 			);
 			return $this->run( "/segments/$list_id", $args, 'POST' );
-
 		}
 
 		/**
@@ -1399,14 +1617,13 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function update_segment( $segment_id, $title, $rule_groups = '' ) {
 
-			$args = array( 'Title' => $title );
+			$args = array( 'Tit	=> $title );
 
 			if( $rule_groups !== '' ){
 				$args['RuleGroups'] = $rule_groups;
 			}
 
 			return $this->run( "/segments/$segment_id", $args, 'PUT' );
-
 		}
 
 		/**
@@ -1456,7 +1673,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object                   Active subscribers
 		 */
 		public function get_active_segment_subscribers( $segment_id, $date = '', $page = 1, $page_size = 1000, $order_field = 'date', $order_direction = 'asc' ) {
-
 			$args = array(
 				'date' => $date,
 				'page' => $page,
@@ -1465,7 +1681,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderdirection' => $order_direction,
 			);
 			return $this->run( "/segments/$segment_id/active", $args );
-
 		}
 
 		/**
@@ -1541,7 +1756,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 												 Email for confirmation.
 		 */
 		public function add_subscriber( $list_id, $email, $name, $custom_fields, $resub, $restart_sub_based_autos ) {
-
 			$args = array(
 				'EmailAddress' => $email,
 				'Name' => $name,
@@ -1550,7 +1764,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'RestartSubscriptionBasedAutoresponders' => $restart_sub_based_autos,
 			);
 			return $this->run( "/subscribers/$list_id", $args, 'POST' );
-
 		}
 
 		/**
@@ -1609,7 +1822,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object                          Confirmation code.
 		 */
 		public function update_subscriber( $list_id, $email, $name, $custom_fields, $resub, $restart_sub_based_autos ) {
-
 			$args = array(
 				'EmailAddress' => $email,
 				'Name' => $name,
@@ -1618,7 +1830,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'RestartSubscriptionBasedAutoresponders' => $restart_sub_based_autos,
 			);
 			return $this->run( "/subscribers/$list_id", $args, 'PUT' );
-
 		}
 
 		/**
@@ -1682,7 +1893,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 												 Confirmation code.
 		 */
 		public function add_subscribers( $list_id, $subs, $resub, $queue_sub_based_autos, $restart_sub_based_autos ) {
-
 			$args = array(
 				'Subscribers' => $subs,
 				'Resubscribe' => $resub,
@@ -1690,7 +1900,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'RestartSubscriptionBasedAutoresponders' => $restart_sub_based_autos,
 			);
 			return $this->run( "/subscribers/$list_id/import", $args, 'POST' );
-
 		}
 
 		/**
@@ -1786,14 +1995,12 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return 										 Confirmation code and ID.
 		 */
 		public function add_template( $client_id, $name, $html_url, $zip_url ) {
-
 			$args = array(
 				'Name' => $name,
 				'HtmlPageURL' => $html_url,
 				'ZipFileURL' => $zip_url,
 			);
 			return $this->run( "/templates/$client_id", $args, 'POST' );
-
 		}
 
 		/**
@@ -1809,14 +2016,12 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object              Confirmation code.
 		 */
 		public function update_template( $template_id, $name, $html_url, $zip_url ) {
-
 			$args = array(
 				'Name' => $name,
 				'HtmlPageURL' => $html_url,
 				'ZipFileURL' => $zip_url,
 			);
 			return $this->run( "/templates/$template_id", $args, 'PUT' );
-
 		}
 
 		/**
@@ -1843,13 +2048,11 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object            List of responses.
 		 */
 		public function get_smart_transactional_email_list( $status = 'all', $client_id ) {
-
 			$args = array(
 				'status' => $status,
 				'clientID' => $client_id
 			);
 			return $this->run( "/transactiona/smartEmail", $args, 'GET', true );
-
 		}
 
 		/**
@@ -1879,7 +2082,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return Object                     Confirmation code and message.
 		 */
 		public function send_smart_email( $smart_email_id, $to, $cc, $bcc, $attachments, $data, $add_recips_to_list ) {
-
 			$args = array(
 				'To' => $to,
 				'CC' => $cc,
@@ -1889,7 +2091,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'AddRecipientsToList' => $add_recips_to_list,
 			);
 			return $this->run( "/transactional/smartEmail/$smart_email_id", $args, 'POST', true );
-
 		}
 
 		/**
@@ -1915,7 +2116,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return Object                     Body detailing successful email acceptances.
 		 */
 		public function send_classic_email( $client_id, $subject, $from, $reply_to, $to, $cc, $bcc, $html, $text = false, $attachments = array(), $track_opens = true, $track_clicks = true, $inline_css = true, $group = false, $add_recips_to_list = false ) {
-
 			$args = array(
 				'Subject' => $subject,
 				'From' => $from,
@@ -1941,7 +2141,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 			}
 
 			return $this->run( "/transactional/classicEmail/send?clientID=$client_id", $args, 'POST', true );
-
 		}
 
 		/**
@@ -1980,7 +2179,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object            Statistics
 		 */
 		public function get_email_statistics( $group = '', $from = '', $to = '', $time_zone = '', $client_id = '' ) {
-
 			$args = array(
 				'group' => $group,
 				'from' => $from,
@@ -1989,7 +2187,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'clientID' => $clientID,
 			);
 			return $this->run( "/transactional/statistics", $args, 'GET', true );
-
 		}
 
 		/**
@@ -2015,7 +2212,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object									 List of sent messages following the given filters.
 		 */
 		public function get_list_message_timeline( $group = '', $sent_before_id = null, $sent_after_id = null, $count = 50, $status = 'all', $client_id = '' ) {
-
 			$args = array(
 				'group' => $group,
 				'count' => $count,
@@ -2030,7 +2226,6 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				$args['sentAfterID'] = $sent_after_id;
 			}
 			return $this->run( "/transactional/messages", $args, 'GET', true );
-
 		}
 
 		/**
