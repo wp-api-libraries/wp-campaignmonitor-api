@@ -1723,45 +1723,177 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 			return $this->run( "/subscribers/$list_id", array( 'email' => $email ) );
 		}
 
-		public function delete_active_subscriber( $list_id ) {
-
+		/**
+		 * Unsubscribing a subscriber
+		 *
+		 * Changes the status of an Active Subscriber to an Unsubscribed Subscriber
+		 * who will no longer receive campaigns sent to the subscriber list to which
+		 * they belong.
+		 *
+		 * If the list is set to add unsubscribing subscribers to the suppression list,
+		 * then the subscriber’s email address will also be added to the suppression
+		 * list.
+		 *
+		 * @param  string $list_id
+		 * @param  string $email
+		 * @return object          Confirmation code.
+		 */
+		public function unsubscribe_subscriber( $list_id, $email ) {
+			return $this->run( "/subscribers/$list_id/unsubscribe", array( '/EmailAddress' => $email ), 'POST' );
 		}
 
+		/**
+		 * Deleting a subscriber
+		 *
+		 * Changes the status of an Active Subscriber to a Deleted Subscriber who will
+		 * no longer receive campaigns sent to the subscriber list to which they belong.
+		 *
+		 * This will not result in the subscriber’s email address being added to the
+		 * suppression list.
+		 *
+		 * @param  string $list_id
+		 * @param  string $email
+		 * @return object          Confirmation code.
+		 */
 		public function delete_subscriber( $list_id, $email ) {
-
+			return $this->run( "/subscribers/$list_id.$this->format?email=$email", array(), 'DELETE' );
 		}
 
 		/** TEMPLATES. */
+		/**
+		 * Getting a template
+		 *
+		 * Returns all the basic details for a specific template including the name,
+		 * ID, preview URL and screenshot URL.
+		 *
+		 * @param  string $template_id
+		 * @return object              Template
+		 */
 		public function get_template( $template_id ) {
+			return $this->run( "/templates/$template_id" );
+		}
+
+		/**
+		 * Creating a template.
+		 *
+		 * Adds a new template for an existing client by providing the name of the
+		 * template and URLs for the HTML file and a zip of all other files.
+		 *
+		 * @param  string $template_id
+		 * @param  string $name
+		 * @param  string $html_url
+		 * @param  string $zip_url
+		 * @return 										 Confirmation code and ID.
+		 */
+		public function add_template( $client_id, $name, $html_url, $zip_url ) {
+
+			$args = array(
+				'Name' => $name,
+				'HtmlPageURL' => $html_url,
+				'ZipFileURL' => $zip_url,
+			);
+			return $this->run( "/templates/$client_id", $args, 'POST' );
 
 		}
 
-		public function add_template( $template_id ) {
+		/**
+		 * Updating a template
+		 *
+		 * Updates an existing template for a client. You can update the name of the
+		 * template and URLs for the HTML file and zip file.
+		 *
+		 * @param  string $template_id
+		 * @param  string $name
+		 * @param  string $html_url
+		 * @param  string $zip_url
+		 * @return object              Confirmation code.
+		 */
+		public function update_template( $template_id, $name, $html_url, $zip_url ) {
+
+			$args = array(
+				'Name' => $name,
+				'HtmlPageURL' => $html_url,
+				'ZipFileURL' => $zip_url,
+			);
+			return $this->run( "/templates/$template_id", $args, 'PUT' );
 
 		}
 
-		public function update_template( $template_id ) {
-
-		}
-
+		/**
+		 * Deleting a template
+		 *
+		 * Deletes an existing template based on the template ID.
+		 *
+		 * @param  string $template_id
+		 * @return object              Confirmation code.
+		 */
 		public function delete_template( $template_id ) {
-
+			return $this->run( "/templates/$template_id", array(), 'DELETE' );
 		}
 
 		/** TRANSACTIONAL. */
+
+		/**
+		 * Smart email listing.
+		 *
+		 * To get a list of smart transactional emails, filtered by status:
+		 *
+		 * @param  string $status
+		 * @param  string $client_id
+		 * @return object            List of responses.
+		 */
 		public function get_smart_transactional_email_list( $status = 'all', $client_id ) {
 
+			$args = array(
+				'status' => $status,
+				'clientID' => $client_id
+			);
+			return $this->run( "/transactiona/smartEmail", $args, 'GET', true );
+
 		}
 
+		/**
+		 * Smart email details
+		 *
+		 * To get the details for a smart transactional email.
+		 *
+		 * @param  string $smart_email_id
+		 * @return object                 Smart email details.
+		 */
 		public function get_smart_transactional_email_details( $smart_email_id ) {
+			return $this->run( "/transactional/smartEmail/$smart_email_id", array(), 'GET', true );
+		}
+
+		/**
+		 * Send a smart email
+		 *
+		 * To deliver a smart email.
+		 *
+		 * @param  string $smart_email_id
+		 * @param  string $to
+		 * @param  string $cc
+		 * @param  string $bcc
+		 * @param  array  $attachments
+		 * @param  array  $data
+		 * @param  bool   $add_recips_to_list
+		 * @return Object                     Confirmation code and message.
+		 */
+		public function send_smart_email( $smart_email_id, $to, $cc, $bcc, $attachments, $data, $add_recips_to_list ) {
+
+			$args = array(
+				'To' => $to,
+				'CC' => $cc,
+				'BCC' => $bcc,
+				'Attachments' => $attachments,
+				'Data' => $data,
+				'AddRecipientsToList' => $add_recips_to_list,
+			);
+			return $this->run( "/transactional/smartEmail/$smart_email_id", $args, 'POST', true );
 
 		}
 
-		public function send_smart_email( $smart_email_id ) {
 
-		}
-
-		public function send_classic_email( $client_id ) {
+		public function send_classic_email( $client_id, $subject, $from, $reply_to, $to, $cc, $bcc, $html, $text ) {
 
 		}
 
