@@ -1,8 +1,9 @@
 <?php
 /**
- * WP Campaign Monitor API (https://www.campaignmonitor.com/api/)
+ * WP Campaign Monitor API
  *
- * @package WP-CampaignMonitor-API
+ * @link https://www.campaignmonitor.com/api/ API Docs
+ * @package WP-API-Libraries\WP-CampaignMonitor-API
  */
 
 /*
@@ -26,6 +27,8 @@ include_once( 'wp-api-libraries-base.php' );
 if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 	/**
 	 * CampaignMonitorAPI class.
+	 *
+	 * @link https://www.campaignmonitor.com/api/ API Docs
 	 */
 	class CampaignMonitorAPI extends WpLibrariesBase {
 		/**
