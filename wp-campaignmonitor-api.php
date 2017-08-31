@@ -132,7 +132,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 				 The request.
 		 */
 		protected function run( $request, $args = array(), $method = 'GET', $use_other = false ){
-			return $this->build_request( $request, $args, $method, $use_other )->fetch();
+			return $this->build_request( '/' . $request, $args, $method, $use_other )->fetch();
 		}
 
 		/**
@@ -176,7 +176,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object List of all the clients in your account.
 		 */
 		public function get_clients() {
-			return $this->run( '/clients' );
+			return $this->run( 'clients' );
 		}
 
 		/**
@@ -190,7 +190,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *                number of credits in your account.
 		 */
 		public function get_billing_details() {
-			return $this->run( '/billingdetails' );
+			return $this->run( 'billingdetails' );
 		}
 
 		/**
@@ -203,7 +203,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object List of all valid countries.
 		 */
 		public function get_valid_countries() {
-			return $this->run( '/countries' );
+			return $this->run( 'countries' );
 		}
 
 		/**
@@ -216,7 +216,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object List of all valid timezones accepted as input.
 		 */
 		public function get_valid_timezones() {
-			return $this->run( '/timezones' );
+			return $this->run( 'timezones' );
 		}
 
 		/**
@@ -231,7 +231,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object	Current date.
 		 */
 		public function get_systemdate() {
-			return $this->run( '/systemdate' );
+			return $this->run( 'systemdate' );
 		}
 
 		/**
@@ -250,7 +250,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'EmailAddress' => $email,
 				'Name' => $name,
 			);
-			return $this->run( '/admins', $args, 'POST' );
+			return $this->run( 'admins', $args, 'POST' );
 		}
 
 		/**
@@ -271,7 +271,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 */
 		public function update_administrator( $email, $new_email, $new_name ) {
 
-			$request = '/admins.' . $this->format . '?email=' . $email;
+			$request = 'admins.' . $this->format . '?email=' . $email;
 			$args = array(
 				'EmailAddress' => $email,
 				'Name' => $name,
@@ -289,7 +289,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object List of all administrators.
 		 */
 		public function get_administrators() {
-			return $this->run( '/admins' );
+			return $this->run( 'admins' );
 		}
 
 		/**
@@ -305,7 +305,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 			$args = array(
 				'email' => $email,
 			);
-			return $this->run( '/admins', $args );
+			return $this->run( 'admins', $args );
 		}
 
 		/**
@@ -319,7 +319,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 			 Confirmation code.
 		 */
 		public function delete_admin( $email ) {
-			$request = '/admins' . $this->format . '?email=' . $email;
+			$request = 'admins' . $this->format . '?email=' . $email;
 			return $this->run( $request, array(), 'DELETE', true );
 		}
 
@@ -334,7 +334,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object				 Confirmation code
 		 */
 		public function set_primary_account( $email ) {
-			$request = '/primarycontact' . $this->format . '?email=' . $email;
+			$request = 'primarycontact' . $this->format . '?email=' . $email;
 
 			return $this->run( $request, array(), 'PUT', true );
 		}
@@ -349,7 +349,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object Primary account email.
 		 */
 		public function get_primary_account() {
-			return $this->run( '/primarycontact' );
+			return $this->run( 'primarycontact' );
 		}
 
 		/**
@@ -386,7 +386,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'IntegratorID' => $integrator_id,
 				'ClientID' => $client_id,
 			);
-			return $this->run( '/externalsession', $args, 'PUT' );
+			return $this->run( 'externalsession', $args, 'PUT' );
 		}
 
 		/** CAMPAIGNS. */
@@ -437,7 +437,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 			if( $text_url !== '' ){
 				$args['TextUrl'] = $text_url;
 			}
-			return $this->run( '/campaigns/' . $client_d, $args, 'POST' );
+			return $this->run( 'campaigns/' . $client_d, $args, 'POST' );
 		}
 
 		/**
@@ -462,7 +462,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object					   ID of campaign created.
 		 */
 		public function add_campaign_from_template( $client_id, $campaign ) {
-			return $this->run( "/campaigns/$client_id/fromtemplate", $campaign, 'POST' );
+			return $this->run( "campaigns/$client_id/fromtemplate", $campaign, 'POST' );
 		}
 
 		/**
@@ -490,7 +490,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'ConfirmationEmail' => $confirmation_email,
 				'SendDate' => $send_date,
 			);
-			return $this->run( "/campaigns/$campaign_id/send", $args, 'POST' );
+			return $this->run( "campaigns/$campaign_id/send", $args, 'POST' );
 		}
 
 		/**
@@ -513,7 +513,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'PreviewRecipients' => $preview_recipients,
 				'Personalize' => $personalize,
 			);
-			return $this->run( "/campaigns/$campaign_id/sendpreview", $args, 'POST' );
+			return $this->run( "campaigns/$campaign_id/sendpreview", $args, 'POST' );
 		}
 
 		/**
@@ -528,7 +528,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 						 Campaign summary.
 		 */
 		public function get_campaign_summary( $campaign_id ) {
-			return $this->run( "/campaigns/$campaign_id/summary" );
+			return $this->run( "campaigns/$campaign_id/summary" );
 		}
 
 		/**
@@ -544,7 +544,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 						 The email clients used to open the campaign + some.
 		 */
 		public function get_list_campaign_client_emails( $campaign_id ) {
-			return $this->run( "/campaigns/$campaign_id/emailclientusage" );
+			return $this->run( "campaigns/$campaign_id/emailclientusage" );
 		}
 
 		/**
@@ -557,7 +557,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 						 Lists and segments any campaign was sent to.
 		 */
 		public function get_lists_and_segments_campaign( $campaign_id ) {
-			return $this->run( "/campaigns/$campaign_id/listsandsegments" );
+			return $this->run( "campaigns/$campaign_id/listsandsegments" );
 		}
 
 		/**
@@ -589,7 +589,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/campaigns/$campaign_id/recipients", $args );
+			return $this->run( "campaigns/$campaign_id/recipients", $args );
 		}
 
 		/**
@@ -622,7 +622,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/campaigns/$campaign_id/bounces", $args );
+			return $this->run( "campaigns/$campaign_id/bounces", $args );
 		}
 
 		/**
@@ -657,7 +657,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/campaigns/$campaign_id/opens", $args );
+			return $this->run( "campaigns/$campaign_id/opens", $args );
 		}
 
 		/**
@@ -692,7 +692,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/campaigns/$campaign_id/clicks", $args );
+			return $this->run( "campaigns/$campaign_id/clicks", $args );
 		}
 
 		/**
@@ -725,7 +725,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/campaigns/$campaign_id/unsubscribes", $args );
+			return $this->run( "campaigns/$campaign_id/unsubscribes", $args );
 		}
 
 		/**
@@ -758,7 +758,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/campaigns/$campaign_id/spam", $args );
+			return $this->run( "campaigns/$campaign_id/spam", $args );
 		}
 
 		/**
@@ -774,7 +774,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 						 Confirmation code.
 		 */
 		public function delete_campaign( $campaign_id ) {
-			return $this->run( '/campaigns/' . $campaign_id, array(), 'DELETE' );
+			return $this->run( 'campaigns/' . $campaign_id, array(), 'DELETE' );
 		}
 
 		/**
@@ -789,7 +789,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 						 Confirmation code.
 		 */
 		public function unschedule_campaign( $campaign_id ) {
-			return $this->run( "/campaigns/$campaign_id/unschedule", array(), 'POST' );
+			return $this->run( "campaigns/$campaign_id/unschedule", array(), 'POST' );
 		}
 
 		/** CLIENTS. */
@@ -812,7 +812,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Country' => $country,
 				'TimeZone' => $timezone,
 			);
-			return $this->run( '/clients', $args, 'POST' );
+			return $this->run( 'clients', $args, 'POST' );
 		}
 
 		/**
@@ -830,7 +830,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 Client details.
 		 */
 		public function get_client_details( $client_id ) {
-			return $this->run( '/clients/' . $client_id );
+			return $this->run( 'clients/' . $client_id );
 		}
 
 		/**
@@ -845,7 +845,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 List of all sent campaigns for this client
 		 */
 		public function get_sent_campaign( $client_id ) {
-			return $this->run( "/clients/$client_id/campaigns" );
+			return $this->run( "clients/$client_id/campaigns" );
 		}
 
 		/**
@@ -860,7 +860,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 A list of all currently scheduled campaigns
 		 */
 		public function get_schedule_campaign( $client_id ) {
-			return $this->run( "/clients/$client_id/scheduled" );
+			return $this->run( "clients/$client_id/scheduled" );
 		}
 
 		/**
@@ -875,7 +875,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 A list of all draft campaigns related to this client.
 		 */
 		public function get_draft_campaign( $client_id ) {
-			return $this->run( "/clients/$client_id/drafts" );
+			return $this->run( "clients/$client_id/drafts" );
 		}
 
 		/**
@@ -889,7 +889,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 A list of subscribers lists. Heh.
 		 */
 		public function get_subscriber_lists( $client_id ) {
-			return $this->run( "/clients/$client_id/lists" );
+			return $this->run( "clients/$client_id/lists" );
 		}
 
 		/**
@@ -909,7 +909,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *                           is present.
 		 */
 		public function get_lists_email_address( $client_id, $email ) {
-			return $this->run( "/clients/$client_id/listsforemail", array('email' => $email ) );
+			return $this->run( "clients/$client_id/listsforemail", array('email' => $email ) );
 		}
 
 		/**
@@ -922,7 +922,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 A list of all list segments for this client.
 		 */
 		public function get_segments( $client_id ) {
-			return $this->run( "/clients/$client_id/segments" );
+			return $this->run( "clients/$client_id/segments" );
 		}
 
 		/**
@@ -951,7 +951,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/clients/$client_id/suppressionlist", $args );
+			return $this->run( "clients/$client_id/suppressionlist", $args );
 		}
 
 		/**
@@ -965,7 +965,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 							 Confirmation code.
 		 */
 		public function suppress_email_address( $client_id, $email_addresses ) {
-			return $this->run( "/clients/$client_id/suppress", array( 'EmailAddresses' => $email_addresses) );
+			return $this->run( "clients/$client_id/suppress", array( 'EmailAddresses' => $email_addresses) );
 		}
 
 		/**
@@ -980,7 +980,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 Confirmation code
 		 */
 		public function unsuppress_email_address( $client_id, $email ) {
-			$request = "/clients/$client_id/unsuppress.$this->format?email=$email";
+			$request = "clients/$client_id/unsuppress.$this->format?email=$email";
 			return $this->run( $request, array(), 'PUT', true );
 		}
 
@@ -995,7 +995,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 A list of the templates belonging to the client.
 		 */
 		public function get_templates( $client_id ) {
-			return $this->run( "/clients/$client_id/templates/" );
+			return $this->run( "clients/$client_id/templates/" );
 		}
 
 		/**
@@ -1017,7 +1017,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Country' => $country,
 				'TimeZone' => $timezone,
 			);
-			return $this->run( "/clients/$client_id/setbasics", $args, 'PUT' );
+			return $this->run( "clients/$client_id/setbasics", $args, 'PUT' );
 		}
 
 		/**
@@ -1061,7 +1061,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'MarkupPerRecipient' => $markup_per_recipient,
 				'MarkupOnDesignSpamTest' => $markup_on_design_spam_test,
 			);
-			return $this->run( "/clients/$client_id/setpaygbilling", $args, 'PUT' );
+			return $this->run( "clients/$client_id/setpaygbilling", $args, 'PUT' );
 		}
 
 		/**
@@ -1090,7 +1090,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'MarkupPercentage' => $markup_percentage,
 				'MonthlyScheme' => $monthly_scheme,
 			);
-			return $this->run("/clients/$client_id/setmonthlybilling", $args, 'PUT' );
+			return $this->run("clients/$client_id/setmonthlybilling", $args, 'PUT' );
 		}
 
 		/**
@@ -1124,7 +1124,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Credits' => $credits,
 				'CanUseMyCreditsWhenTheyRunOut' => $can_use_my_credits,
 			);
-			return $this->run( "/clients/$client_id/credits", $args, 'POST' );
+			return $this->run( "clients/$client_id/credits", $args, 'POST' );
 		}
 
 		/**
@@ -1137,7 +1137,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return Object
 		 */
 		public function delete_client( $client_id ) {
-			return $this->run( "/clients/$client_id", array(), 'DELETE' );
+			return $this->run( "clients/$client_id", array(), 'DELETE' );
 		}
 
 		/**
@@ -1163,7 +1163,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'AccessLevel' => $access,
 				'Password' => $pass,
 			);
-			return $this->run( "/clients/$client_id/people", $args, 'POST' );
+			return $this->run( "clients/$client_id/people", $args, 'POST' );
 		}
 
 		/**
@@ -1189,7 +1189,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'AccessLevel' => $access,
 				'Password' => $pass,
 			);
-			return $this->run( "/clients/$client_id/people", $args, 'PUT' );
+			return $this->run( "clients/$client_id/people", $args, 'PUT' );
 		}
 
 		/**
@@ -1204,7 +1204,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 *                           with a particular client.
 		 */
 		public function get_people( $client_id ) {
-			return $this->run( "/clients/$client_id/people" );
+			return $this->run( "clients/$client_id/people" );
 		}
 
 		/**
@@ -1218,7 +1218,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return Object            The details of a single person associated with a client.
 		 */
 		public function get_person_details( $client_id, $email ) {
-			return $this->run( "/clients/$client_id/people", array( 'email' => $email ) );
+			return $this->run( "clients/$client_id/people", array( 'email' => $email ) );
 		}
 
 		/**
@@ -1233,7 +1233,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return Object 					 OK response
 		 */
 		public function delete_person( $client_id, $email ) {
-			return $this->run( "/clients/$client_id/people.$this->format?email=$email", array(), "DELETE", true );
+			return $this->run( "clients/$client_id/people.$this->format?email=$email", array(), "DELETE", true );
 		}
 
 		/**
@@ -1248,7 +1248,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 Email address as a confirmation.
 		 */
 		public function set_primary_contact( $client_id, $email ) {
-			return $this->run( "/clients/$client_id/primarycontact.$this->format?email=$email", array(), "PUT", true );
+			return $this->run( "clients/$client_id/primarycontact.$this->format?email=$email", array(), "PUT", true );
 		}
 
 		/**
@@ -1262,7 +1262,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object            Email address of primary contact.
 		 */
 		public function get_primary_contact( $client_id ) {
-			return $this->run( "/clients/$client_id/primarycontact" );
+			return $this->run( "clients/$client_id/primarycontact" );
 		}
 
 		/** LISTS. */
@@ -1294,7 +1294,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'ConfirmedOptIn' => $confirmed_opt_in,
 				'ConfirmationSuccessPage' => $confirmation_page,
 			);
-			return $this->run( "/lists/$client_id", $args, 'POST' );
+			return $this->run( "lists/$client_id", $args, 'POST' );
 		}
 
 		/**
@@ -1309,7 +1309,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Details for a single list.
 		 */
 		public function get_list_details( $list_id ) {
-			return $this->run( '/lists/' . $list_id );
+			return $this->run( 'lists/' . $list_id );
 		}
 
 		/**
@@ -1325,7 +1325,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Stats for a list.
 		 */
 		public function get_list_stats( $list_id ) {
-			return $this->run( "/lists/$list_id/stats" );
+			return $this->run( "lists/$list_id/stats" );
 		}
 
 		/**
@@ -1340,7 +1340,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Custom fields for a list.
 		 */
 		public function get_list_custom_fields( $list_id ) {
-			return $this->run( "/lists/$list_id/customfields" );
+			return $this->run( "lists/$list_id/customfields" );
 		}
 
 		/**
@@ -1355,7 +1355,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Segments for a list.
 		 */
 		public function get_list_segments( $list_id ) {
-			return $this->run( "/lists/$list_id/segments" );
+			return $this->run( "lists/$list_id/segments" );
 		}
 
 		/**
@@ -1383,7 +1383,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/lists/$list_id/active", $args );
+			return $this->run( "lists/$list_id/active", $args );
 		}
 
 		/**
@@ -1413,7 +1413,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/lists/$list_id/uncomfirmed", $args );
+			return $this->run( "lists/$list_id/uncomfirmed", $args );
 		}
 
 		/**
@@ -1441,7 +1441,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/lists/$list_id/bounced", $args );
+			return $this->run( "lists/$list_id/bounced", $args );
 		}
 
 		/**
@@ -1470,7 +1470,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/lists/$list_id/deleted", $args );
+			return $this->run( "lists/$list_id/deleted", $args );
 		}
 
 		/**
@@ -1509,7 +1509,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'AddUnsubscribesToSuppList' => $add_unsubs_to_supp_list,
 				'ScrubActiveWithSuppList' => $scrub_active_with_supp_list,
 			);
-			return $this->run( "/lists/$list_id", $args, 'PUT' );
+			return $this->run( "lists/$list_id", $args, 'PUT' );
 		}
 
 		/**
@@ -1541,7 +1541,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Options' => $options,
 				'VisibleInPreferenceCenter' => $visible_in_center,
 			);
-			return $this->run( "/lists/$list_id/customfields", $args, 'POST' );
+			return $this->run( "lists/$list_id/customfields", $args, 'POST' );
 		}
 
 		/**
@@ -1562,7 +1562,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'FieldName' => $field_name,
 				'VisibleInPreferenceCenter' => $visible_in_center,
 			);
-			return $this->run( "/lists/$list_id/customfields/$custom_field_key", $args, 'PUT' );
+			return $this->run( "lists/$list_id/customfields/$custom_field_key", $args, 'PUT' );
 		}
 
 		/**
@@ -1585,7 +1585,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'KeepExistingOptions' => $keep_options,
 				'Options' => $options,
 			);
-			return $this->run( "/lists/$list_id/customfields/$custom_field_key", $args, 'PUT' );
+			return $this->run( "lists/$list_id/customfields/$custom_field_key", $args, 'PUT' );
 		}
 
 		/**
@@ -1600,7 +1600,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object                   Confirmation code.
 		 */
 		public function delete_custom_field( $list_id, $custom_field_key ) {
-			return $this->run( "/lists/$list_id/customfields/$custom_field_key", array(), 'DELETE' );
+			return $this->run( "lists/$list_id/customfields/$custom_field_key", array(), 'DELETE' );
 		}
 
 		/**
@@ -1613,7 +1613,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Confirmation code.
 		 */
 		public function delete_list( $list_id ) {
-			return $this->run( "/lists/$list_id", array(), 'DELETE' );
+			return $this->run( "lists/$list_id", array(), 'DELETE' );
 		}
 
 		/**
@@ -1628,7 +1628,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Webhooks
 		 */
 		public function get_list_webhooks( $list_id ) {
-			return $this->run( "/lists/$list_id" );
+			return $this->run( "lists/$list_id" );
 		}
 
 		/**
@@ -1650,7 +1650,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Url' => $url,
 				'PayloadFormat' => $payload_format,
 			);
-			return $this->run( "/lists/$list_id/webhooks", $args, 'POST' );
+			return $this->run( "lists/$list_id/webhooks", $args, 'POST' );
 		}
 
 		/**
@@ -1667,7 +1667,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object             Response of whether it works or not.
 		 */
 		public function get_test_webhook( $list_id, $webhook_id ) {
-			return $this->run( "/lists/$list_id/webhooks/$webhook_id/test" );
+			return $this->run( "lists/$list_id/webhooks/$webhook_id/test" );
 		}
 
 		/**
@@ -1681,7 +1681,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object             Confirmation code.
 		 */
 		public function delete_webhook( $list_id, $webhook_id ) {
-			return $this->run ("/lists/$list_id/webhooks/$webhook_id", array(), 'DELETE' );
+			return $this->run ("lists/$list_id/webhooks/$webhook_id", array(), 'DELETE' );
 		}
 
 		/**
@@ -1696,7 +1696,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 				    Confirmation code.
 		 */
 		public function add_active_webhook( $list_id, $webhook_id ) {
-			return $this->run( "/lists/$list_id/webhooks/$webhook_id/activate", array(), 'PUT' );
+			return $this->run( "lists/$list_id/webhooks/$webhook_id/activate", array(), 'PUT' );
 		}
 
 		/**
@@ -1711,7 +1711,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object             Confirmation code.
 		 */
 		public function delete_active_webhook( $list_id, $webhook_id ) {
-			return $this->run( "/lists/$list_id/webhooks/$webhook_id/deactivate", array(), 'PUT' );
+			return $this->run( "lists/$list_id/webhooks/$webhook_id/deactivate", array(), 'PUT' );
 		}
 
 		/** SEGMENTS. */
@@ -1738,7 +1738,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Title' => $title,
 				'RuleGroups' => $rule_groups,
 			);
-			return $this->run( "/segments/$list_id", $args, 'POST' );
+			return $this->run( "segments/$list_id", $args, 'POST' );
 		}
 
 		/**
@@ -1767,7 +1767,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				$args['RuleGroups'] = $rule_groups;
 			}
 
-			return $this->run( "/segments/$segment_id", $args, 'PUT' );
+			return $this->run( "segments/$segment_id", $args, 'PUT' );
 		}
 
 		/**
@@ -1785,7 +1785,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return 										Confirmation code.
 		 */
 		public function add_segment_rulegroup( $segment_id, $rules ) {
-			return $this->run( "/segments/$segment_id/rules", array( 'Rules' => $rules ), 'POST' );
+			return $this->run( "segments/$segment_id/rules", array( 'Rules' => $rules ), 'POST' );
 		}
 
 		/**
@@ -1799,7 +1799,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object             Segment's details.
 		 */
 		public function get_segment_details( $segment_id ) {
-			return $this->run( "/segments/$segment_id" );
+			return $this->run( "segments/$segment_id" );
 		}
 
 		/**
@@ -1827,7 +1827,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'orderfield' => $order_field,
 				'orderdirection' => $order_direction,
 			);
-			return $this->run( "/segments/$segment_id/active", $args );
+			return $this->run( "segments/$segment_id/active", $args );
 		}
 
 		/**
@@ -1839,7 +1839,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object             Confirmation code.
 		 */
 		public function delete_segment( $segment_id ) {
-			return $this->run( "/segments/$segment_id", array(), 'DELETE' );
+			return $this->run( "segments/$segment_id", array(), 'DELETE' );
 		}
 
 		/**
@@ -1853,7 +1853,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object             Confirmation code.
 		 */
 		public function delete_segment_rule( $segment_id ) {
-			return $this->run( "/segments/$segment_id/rules", array(), 'DELETE' );
+			return $this->run( "segments/$segment_id/rules", array(), 'DELETE' );
 		}
 
 		/** SUBSCRIBERS. */
@@ -1913,7 +1913,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Resubscribe' => $resub,
 				'RestartSubscriptionBasedAutoresponders' => $restart_sub_based_autos,
 			);
-			return $this->run( "/subscribers/$list_id", $args, 'POST' );
+			return $this->run( "subscribers/$list_id", $args, 'POST' );
 		}
 
 		/**
@@ -1980,7 +1980,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Resubscribe' => $resub,
 				'RestartSubscriptionBasedAutoresponders' => $restart_sub_based_autos,
 			);
-			return $this->run( "/subscribers/$list_id", $args, 'PUT' );
+			return $this->run( "subscribers/$list_id", $args, 'PUT' );
 		}
 
 		/**
@@ -2051,7 +2051,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'QueueSubscriptionBasedAutoResponders' => $queue_sub_based_autos,
 				'RestartSubscriptionBasedAutoresponders' => $restart_sub_based_autos,
 			);
-			return $this->run( "/subscribers/$list_id/import", $args, 'POST' );
+			return $this->run( "subscribers/$list_id/import", $args, 'POST' );
 		}
 
 		/**
@@ -2066,7 +2066,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Sub's details
 		 */
 		public function get_subscriber_details( $list_id, $email ) {
-			return $this->run( "/subscribers/$list_id", array( 'email' => $email ) );
+			return $this->run( "subscribers/$list_id", array( 'email' => $email ) );
 		}
 
 		/**
@@ -2083,7 +2083,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object
 		 */
 		public function get_subscriber_history( $list_id, $email ) {
-			return $this->run( "/subscribers/$list_id", array( 'email' => $email ) );
+			return $this->run( "subscribers/$list_id", array( 'email' => $email ) );
 		}
 
 		/**
@@ -2103,7 +2103,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Confirmation code.
 		 */
 		public function unsubscribe_subscriber( $list_id, $email ) {
-			return $this->run( "/subscribers/$list_id/unsubscribe", array( '/EmailAddress' => $email ), 'POST' );
+			return $this->run( "subscribers/$list_id/unsubscribe", array( '/EmailAddress' => $email ), 'POST' );
 		}
 
 		/**
@@ -2121,7 +2121,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object          Confirmation code.
 		 */
 		public function delete_subscriber( $list_id, $email ) {
-			return $this->run( "/subscribers/$list_id.$this->format?email=$email", array(), 'DELETE' );
+			return $this->run( "subscribers/$list_id.$this->format?email=$email", array(), 'DELETE' );
 		}
 
 		/** TEMPLATES. */
@@ -2136,7 +2136,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object              Template
 		 */
 		public function get_template( $template_id ) {
-			return $this->run( "/templates/$template_id" );
+			return $this->run( "templates/$template_id" );
 		}
 
 		/**
@@ -2158,7 +2158,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'HtmlPageURL' => $html_url,
 				'ZipFileURL' => $zip_url,
 			);
-			return $this->run( "/templates/$client_id", $args, 'POST' );
+			return $this->run( "templates/$client_id", $args, 'POST' );
 		}
 
 		/**
@@ -2180,7 +2180,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'HtmlPageURL' => $html_url,
 				'ZipFileURL' => $zip_url,
 			);
-			return $this->run( "/templates/$template_id", $args, 'PUT' );
+			return $this->run( "templates/$template_id", $args, 'PUT' );
 		}
 
 		/**
@@ -2193,7 +2193,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object              Confirmation code.
 		 */
 		public function delete_template( $template_id ) {
-			return $this->run( "/templates/$template_id", array(), 'DELETE' );
+			return $this->run( "templates/$template_id", array(), 'DELETE' );
 		}
 
 		/** TRANSACTIONAL. */
@@ -2213,7 +2213,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'status' => $status,
 				'clientID' => $client_id
 			);
-			return $this->run( "/transactiona/smartEmail", $args, 'GET', true );
+			return $this->run( "transactiona/smartEmail", $args, 'GET', true );
 		}
 
 		/**
@@ -2226,7 +2226,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object                 Smart email details.
 		 */
 		public function get_smart_transactional_email_details( $smart_email_id ) {
-			return $this->run( "/transactional/smartEmail/$smart_email_id", array(), 'GET', true );
+			return $this->run( "transactional/smartEmail/$smart_email_id", array(), 'GET', true );
 		}
 
 		/**
@@ -2253,7 +2253,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'Data' => $data,
 				'AddRecipientsToList' => $add_recips_to_list,
 			);
-			return $this->run( "/transactional/smartEmail/$smart_email_id", $args, 'POST', true );
+			return $this->run( "transactional/smartEmail/$smart_email_id", $args, 'POST', true );
 		}
 
 		/**
@@ -2304,7 +2304,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				$args['AddRecipientsToListID'] = $add_recips_to_list;
 			}
 
-			return $this->run( "/transactional/classicEmail/send?clientID=$client_id", $args, 'POST', true );
+			return $this->run( "transactional/classicEmail/send?clientID=$client_id", $args, 'POST', true );
 		}
 
 		/**
@@ -2317,7 +2317,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 					 List of class email groups.
 		 */
 		public function get_classic_email_list( $client_id ) {
-			return $this->run( "/transactional/classicEmail/groups", array( 'clientID' => $client_id ), 'GET', true );
+			return $this->run( "transactional/classicEmail/groups", array( 'clientID' => $client_id ), 'GET', true );
 		}
 
 		/**
@@ -2352,7 +2352,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 				'timezone' => $timezone,
 				'clientID' => $clientID,
 			);
-			return $this->run( "/transactional/statistics", $args, 'GET', true );
+			return $this->run( "transactional/statistics", $args, 'GET', true );
 		}
 
 		/**
@@ -2392,7 +2392,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 			if( $sent_after_id !== null ){
 				$args['sentAfterID'] = $sent_after_id;
 			}
-			return $this->run( "/transactional/messages", $args, 'GET', true );
+			return $this->run( "transactional/messages", $args, 'GET', true );
 		}
 
 		/**
@@ -2406,7 +2406,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object 						 Message details.
 		 */
 		public function get_message_details( $message_id, $statistics = false ) {
-			return $this->run( "/transactional/messages/$message_id", array( 'statistics' => $statistics ), 'GET', true );
+			return $this->run( "transactional/messages/$message_id", array( 'statistics' => $statistics ), 'GET', true );
 		}
 
 		/**
@@ -2419,7 +2419,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @return object             Confirmation response (or failure).
 		 */
 		public function resend_message( $message_id ) {
-			return $this->run( "/transactional/messages/$message_id/resent", array(), 'POST', true );
+			return $this->run( "transactional/messages/$message_id/resent", array(), 'POST', true );
 		}
 
 		/** WEBHOOKS. */
