@@ -8,10 +8,10 @@
 if( !defined( 'ABSPATH' ) ) { exit; }
 
 /* Check if class exists. */
-if( !class_exists( 'WpLibrariesBase' ) ) {
+if( !class_exists( 'WpCMLibrariesBase' ) ) {
 
 	/* Define abstract class. */
-	abstract class WpLibrariesBase{
+	abstract class WpCMLibrariesBase{
 
 		/* */
 		protected $args;
@@ -63,8 +63,6 @@ if( !class_exists( 'WpLibrariesBase' ) ) {
 
 		protected function fetch(){
 
-			// pp( $this->args, 'here' );
-
 			// Make the request.
 			$response = wp_remote_request( $this->base_uri . $this->route, $this->args );
 
@@ -72,13 +70,11 @@ if( !class_exists( 'WpLibrariesBase' ) ) {
 			$code = wp_remote_retrieve_response_code( $response );
 			$body = json_decode( wp_remote_retrieve_body( $response ) );
 
-			// pp( $body );
+			$this->clear();
 
 			if( !$this->is_status_ok( $code ) ) {
 				return new WP_Error( 'response-error', sprintf( __( 'Status: &d', 'wp-postmark-api' ), $code ), $body );
 			}
-
-			$this->clear();
 
 			return $body;
 

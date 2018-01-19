@@ -30,7 +30,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 	 *
 	 * @link https://www.campaignmonitor.com/api/ API Docs
 	 */
-	class CampaignMonitorAPI extends WpLibrariesBase {
+	class CampaignMonitorAPI extends WpCMLibrariesBase {
 		/**
 		 * The API key with which all calls are made. Can be either an account API
 		 * token or a client API token.
@@ -806,7 +806,7 @@ if ( ! class_exists( 'CampaignMonitorAPI' ) ) {
 		 * @param  string $timezone
 		 * @return object 							Confirmation and ID of client created.
 		 */
-		public function add_client( $company_name, $country, $timezone ) {
+		public function add_client( $company_name, $country = 'United States of America', $timezone = '(GMT-08:00) Pacific Time (US & Canada)') {
 			$args = array(
 				'CompanyName' => $company_name,
 				'Country' => $country,
