@@ -73,7 +73,7 @@ if( !class_exists( 'WpCMLibrariesBase' ) ) {
 			$this->clear();
 
 			if( !$this->is_status_ok( $code ) ) {
-				return new WP_Error( 'response-error', sprintf( __( 'Status: &d', 'wp-postmark-api' ), $code ), $body );
+				return new WP_Error( 'response-error', sprintf( __( 'Status: %d', 'wp-postmark-api' ), $code ), $body );
 			}
 
 			return $body;
